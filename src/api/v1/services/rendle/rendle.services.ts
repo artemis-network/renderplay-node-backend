@@ -122,38 +122,44 @@ const resetRendlesGameTypes = async () => {
 }
 
 
-
 const enterIntoRendleContest = async (gameType: number, contestId: string, username: string, confirm: boolean) => {
 	try {
 		const user: any = await User.findOne({ username: username })
 		const contest = await RendleContest.findById(contestId)
-		if (!user?.$isEmpty && !contest?.$isEmpty) {
-			const contestants = contest?.contestants;
-			contestants?.map((contestant) => {
-				if (contestant === user?._id) return { message: "Paid", "error": false }
+		const contestants = contest?.contestants;
+		// contestants?.map((contestant) => {
+		// 	if (contestant === user?._id) return { message: "Paid", "error": false }
+		// })
+		if (confirm) {
+			const rendleGameType = await RendleGameType.findOne({ gameType: gameType });
+			const userWallet = await UserWallet.findOne({ user: user?._id }) || null;
+			if ((rendleGameType?.entryFee || 0) > (userWallet?.balance || 0)) return { message: "insufficent funds", error: true }
+			contestants?.push(user);
+			await contest?.updateOne({
+				$set: {
+					contestants: contestants,
+					prizePool: contest?.prizePool + (rendleGameType?.entryFee || 0)
+				}
 			})
-			if (confirm) {
-				const rendleGameType = await RendleGameType.findOne({ gameType: gameType });
-				const userWallet = await UserWallet.findOne({ user: user?._id }) || null;
-				if ((rendleGameType?.entryFee || 0) > (userWallet?.balance || 0)) return { message: "insufficent funds", error: true }
-				contestants?.push(user);
-				await contest?.updateOne({
-					$set: {
-						contestants: contestants,
-						prizePool: contest?.prizePool + (rendleGameType?.entryFee || 0)
-					}
-				})
-				await contest?.save()
-				userWallet?.updateOne({
-					balance: (userWallet?.balance - (rendleGameType?.entryFee || 0))
-				})
-				return { message: "success", error: false }
-			}
+			await contest?.save()
+			userWallet?.updateOne({
+				balance: (userWallet?.balance - (rendleGameType?.entryFee || 0))
+			})
+			return { message: "success", error: false }
 		}
 		return { message: "user or contest does not exist", error: true }
 	} catch (error) {
 		logger.error("error " + error)
 		return { message: `something went wrong ${error}`, error: true }
+	}
+}
+
+const getRendleContestants = async (contestId: string) => {
+	try {
+		const rendleContestants = await RendleContest.findById(contestId)
+		return { contest: rendleContestants }
+	} catch (e) {
+		return { contest: null }
 	}
 }
 
@@ -190,19 +196,58 @@ const saveRendleContestResult = async (
 const getRendleParticipants = async (contestId: string) => {
 	try {
 		const results = await RendleResult.find()
-		const contest: any = [];
-		results.map((result) => ((String(result?.contestId) || "") === contestId) ? contest.push(result) : null)
-		console.log(contest)
-		return contest;
+		const participants: any = [];
+		results.map((result) => {
+			const _id = String(result?.contestId)
+			if (_id === contestId) participants.push(result);
+		})
+		return { participants: participants };
 	} catch (error) {
 		return []
 	}
 }
+
+const getRendleGameStatus = async (username: string, contestId: string, gameType: number) => {
+	try {
+		const user = await User.findOne({ username: username });
+	} catch (e) {
+		return { message: e }
+	}
+}
+
+// def get_contest_status():
+//     try:
+//         username = request.get_json()["username"]
+//         contest_id = request.get_json()["contest_id"]
+//         game_type = request.get_json()["game_type"]
+//         user = User.query.filter_by(username=username).first()
+//         game_result = GameResult.query.filter_by(user=user.id).all()
+//         status = {}
+//         for game in game_result:
+//             if game.contest_id == contest_id and game.game_type == game_type:
+//                 status = {
+//                     "id": game.id,
+//                     "game_type": game.game_type,
+//                     "starts_on": game.starts_on,
+//                     "completed_on": game.completed_on,
+//                     "is_won": game.is_won,
+//                     "contest_id": game.contest_id,
+//                     "is_first_game": False
+//                 }
+//                 return jsonify({"status": status})
+
+//         status = {"is_first_game": True}
+//         return jsonify({"status": status})
+//     except Exception as e:
+//         print(e)
+//     return jsonify({"message": "Internal server error"})
 
 export {
 	getRendleGameTypes,
 	resetRendlesGameTypes,
 	enterIntoRendleContest,
 	saveRendleContestResult,
-	getRendleParticipants
+	getRendleParticipants,
+	getRendleContestants,
+	getRendleGameStatus
 }

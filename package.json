@@ -2,9 +2,11 @@
   "name": "backend_boiler_plate",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "index.js",
   "scripts": {
-    "start": "ts-node-dev src/index.ts"
+    "dev": "ts-node-dev src/index.ts",
+    "start": "ts-node dist/index.js",
+    "build": "tsc -p ."
   },
   "author": "akash madduru",
   "license": "ISC",

@@ -16,10 +16,6 @@ const date = getCurrentIndianDateTime();
 const numOfHours = 4;
 date.setTime(date.getTime() + numOfHours * 60 * 60 * 1000);
 
-
-console.log(">> Time " + getCurrentIndianDateTime())
-console.log(">> Time " + date)
-
 const rendleGameTypes: Array<RendleGameType> = [
 	{
 		gameType: 5,

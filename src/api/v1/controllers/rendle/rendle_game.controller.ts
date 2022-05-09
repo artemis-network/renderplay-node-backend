@@ -4,7 +4,9 @@ import {
 	resetRendlesGameTypes,
 	enterIntoRendleContest,
 	saveRendleContestResult,
-	getRendleParticipants
+	getRendleParticipants,
+	getRendleContestants,
+	getRendleGameStatus
 } from '../../services/rendle/rendle.services'
 
 
@@ -56,11 +58,34 @@ const getRendleParticipantsController = async (req: Request, res: Response) => {
 	}
 }
 
+const getRendleContestantsController = async (req: Request, res: Response) => {
+	try {
+		const { contestId } = req.body
+		const response = await getRendleContestants(contestId);
+		return res.status(200).json(response)
+	} catch (error) {
+		return res.status(200).json({ message: error })
+	}
+}
+
+const getRendleGameStatusController = async (req: Request, res: Response) => {
+	try {
+		const { contestId, username, gameType } = req.body
+		const response = await getRendleGameStatus(contestId, username, gameType);
+		return res.status(200).json(response)
+	} catch (error) {
+		return res.status(200).json({ message: error })
+	}
+}
+
 
 export {
 	getRendleGameTypesController,
 	resetRendlesGameTypesController,
 	enterRendlesContestController,
 	saveRendleContestResultController,
-	getRendleParticipantsController
+	getRendleParticipantsController,
+	getRendleContestantsController,
+	getRendleGameStatusController
+
 }

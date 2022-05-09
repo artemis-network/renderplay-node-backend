@@ -20,8 +20,8 @@ router.get('/api/v1/users/test-token', authorizeUserMiddleWare, (req, res) => re
 
 router.post("/api/v1/users/activate-user", checkForAccountActivationController)
 router.post("/api/v1/users/verify-user", verifyUserEmailController)
-router.post("/api/v1/users/wallet", getWalletController)
 
-router.post("/api/v1/admin/deposit-funds", depositFundsController)
+router.post("/api/v1/wallets", getWalletController)
+router.post("/api/v1/wallets/deposit", depositFundsController)
 
 export { router as userRoutes }
