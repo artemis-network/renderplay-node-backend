@@ -70,14 +70,13 @@ const getRendleContestantsController = async (req: Request, res: Response) => {
 
 const getRendleGameStatusController = async (req: Request, res: Response) => {
 	try {
-		const { contestId, username, gameType } = req.body
-		const response = await getRendleGameStatus(contestId, username, gameType);
+		const { username, contestId, gameType } = req.body
+		const response = await getRendleGameStatus(username, contestId, gameType);
 		return res.status(200).json(response)
 	} catch (error) {
 		return res.status(200).json({ message: error })
 	}
 }
-
 
 export {
 	getRendleGameTypesController,

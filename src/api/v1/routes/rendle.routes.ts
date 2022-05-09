@@ -12,6 +12,11 @@ import {
 	getRendleGameStatusController
 } from '../controllers/rendle/rendle_game.controller'
 
+import {
+	getRendleCurrentGuessesController,
+	updateCurrentGuessesController
+} from '../controllers/rendle/rendle_game_state.controller'
+
 router.get('/api/v1/rendles', getRendleGameTypesController);
 router.get('/api/v1/rendles/reset', resetRendlesGameTypesController);
 router.post('/api/v1/rendles/enter', enterRendlesContestController);
@@ -19,5 +24,8 @@ router.post('/api/v1/rendles/save', saveRendleContestResultController);
 router.post('/api/v1/rendles/participants', getRendleParticipantsController);
 router.post('/api/v1/rendles/contestants', getRendleContestantsController);
 router.post('/api/v1/rendles/status', getRendleGameStatusController);
+
+router.post('/api/v1/rendles/words', getRendleCurrentGuessesController);
+router.post('/api/v1/rendles/words/update', updateCurrentGuessesController);
 
 export { router as rendleRoutes }

@@ -46,7 +46,6 @@ const resetRendlesGameTypes = () => __awaiter(void 0, void 0, void 0, function* 
         // await RendleGameState.collection.drop()
         const rendles = yield RendleGameType.find().sort({ gameType: -1 });
         rendles.reverse();
-        console.log(rendles);
         rendles.map((rendle, index) => __awaiter(void 0, void 0, void 0, function* () {
             if (rendle.isExpired === true) {
                 if (index === rendles.length - 1) {

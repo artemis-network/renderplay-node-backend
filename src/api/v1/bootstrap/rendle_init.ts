@@ -7,7 +7,7 @@ const { RendleGameType, RendleContest } = db
 type RendleGameTypeInput = {
 	gameType: RendleGameTypeDocument['gameType'];
 	startsOn?: RendleGameTypeDocument['startsOn'];
-	contestId: RendleGameTypeDocument['contestId'];
+	contestId?: RendleGameTypeDocument['contestId'];
 	isExpired: RendleGameTypeDocument['isExpired'],
 	entryFee: RendleGameTypeDocument['entryFee'],
 };
