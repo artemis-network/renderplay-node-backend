@@ -3,7 +3,15 @@ import bcrypt from 'bcrypt';
 import { logger } from '../../utils/logger';
 import { createToken } from '../../utils/token'
 import { generateJWTToken, decodeJWTToken } from '../../utils/jwt';
+import { OAuth2Client } from 'google-auth-library'
 // import { EmailSender, getEmailVerificationHTML } from '../../utils/email'
+
+const client: any = new OAuth2Client(
+	"461311621504-7qc2ioaio08dvv3f2q2f5l25rm0ct0to.apps.googleusercontent.com",
+	"CLIENT_SCRET",
+	"REDIRECT URL"
+)
+
 
 import { UserDocument, UserWalletDocument, db } from '../../models/db'
 const { User, UserWallet } = db;
@@ -170,8 +178,9 @@ const loginUser = async (username: string, password: string) => {
 	}
 }
 
-const googleLogin = async (email: string, username: string) => {
+const googleLogin = async (email: string, username: string, googleToken: string) => {
 	try {
+		await client.VerifyIdToken(googleToken)
 		logger.info(">> creating user " + username + " >> ");
 		logger.info(">> creating token for " + username + " >> ");
 		const userInput: UserInput = {

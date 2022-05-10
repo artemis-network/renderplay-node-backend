@@ -1,11 +1,7 @@
 import moment from 'moment'
 
-enum RenderScanGameType {
-	FREE, PAID
-}
-
 interface RenderScanGameTypes {
-	gameType: RenderScanGameType;
+	gameType: string;
 	startsOn?: Date;
 	isExpired: Boolean,
 	entryFee: number,
@@ -22,13 +18,13 @@ date.setTime(date.getTime() + numOfHours * 60 * 60 * 1000);
 
 const renderscanGameTypes: RenderScanGameTypes[] = [
 	{
-		gameType: RenderScanGameType.FREE,
+		gameType: "FREE",
 		startsOn: getCurrentIndianDateTime(),
 		isExpired: false,
 		entryFee: 1000
 	},
 	{
-		gameType: RenderScanGameType.PAID,
+		gameType: "PAID",
 		startsOn: date,
 		isExpired: false,
 		entryFee: 1500
@@ -36,4 +32,4 @@ const renderscanGameTypes: RenderScanGameTypes[] = [
 
 ]
 
-export { renderscanGameTypes }
+export { renderscanGameTypes, RenderScanGameTypes }

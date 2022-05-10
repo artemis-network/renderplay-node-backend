@@ -1,16 +1,14 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
 
 type RenderScanRefWordDocument = Document & {
-	contestId: string;
 	word: string,
 	image: any,
 };
 
 const renderScanRefWordSchema = new Schema(
 	{
-		contestId: { type: Schema.Types.String, required: true },
-		word: { type: Schema.Types.String, required: true },
-		image: { type: Schema.Types.Buffer, required: true },
+		word: { type: Schema.Types.String, required: false },
+		image: { type: Schema.Types.String, required: true },
 	},
 );
 

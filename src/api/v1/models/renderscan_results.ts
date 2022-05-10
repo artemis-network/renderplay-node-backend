@@ -19,6 +19,6 @@ const renderScanResultsSchema = new Schema(
 
 const RenderScanResults: Model<RenderScanResultsDocument> = mongoose.model<RenderScanResultsDocument>('RendleScanResults', renderScanResultsSchema);
 
-export { RenderScanResults, renderScanResultsSchema };
+export { RenderScanResults, RenderScanResultsDocument };
 
 

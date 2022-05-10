@@ -1,12 +1,8 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
 
-enum RenderScanType {
-	FREE,
-	PAID
-}
 
 type RenderScanGameTypeDocument = Document & {
-	gameType: RenderScanType;
+	gameType: string;
 	startsOn?: Date;
 	contestId?: string,
 	isExpired: Boolean,
@@ -16,7 +12,7 @@ type RenderScanGameTypeDocument = Document & {
 const renderScanGameTypeSchema = new Schema(
 	{
 		gameType: {
-			type: Schema.Types.Number,
+			type: Schema.Types.String,
 			required: true,
 			unique: true,
 		},

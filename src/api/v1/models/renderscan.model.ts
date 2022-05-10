@@ -10,10 +10,10 @@ type RenderScanDocument = Document & {
 const renderScanSchema = new Schema(
 	{
 		scan: {
-			type: Schema.Types.Buffer,
+			type: Schema.Types.String,
 			required: true,
 		},
-		filename: {
+		fileUrl: {
 			type: Schema.Types.String,
 			required: true,
 		},
