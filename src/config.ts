@@ -16,7 +16,7 @@ const EMAIL_CONFIG = {
 const JWT_SECRET = process.env.JWT_SECRET || ""
 const GOOGLE_OAUTH_CLIENT = process.env.GOOGLE_OUTH_CLIENT_CREDENTIAL || ""
 const MONGO_DB_URL = process.env.MONGO_DB_URL || ""
-const PORT = process.env.PORT || 0
+const PORT = process.env.PORT || 5000
 
 export {
 	PORT,
