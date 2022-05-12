@@ -1,5 +1,6 @@
 import { db } from "../../models/db"
-const { User, UserWallet } = db
+import { logger } from "../../utils/logger";
+const { UserWallet } = db
 
 interface Result {
 	error?: boolean,
@@ -9,6 +10,7 @@ interface Result {
 
 const getWallet = async (userId: string) => {
 	try {
+		logger.info(`>> fetching wallet by user id`)
 		const wallet = await UserWallet.findOne({ user: userId })
 		const result: Result = {
 			error: false,
@@ -23,7 +25,9 @@ const getWallet = async (userId: string) => {
 
 const depositFunds = async (userId: string, amount: number) => {
 	try {
+		logger.info(`>> fetching wallet by user id`)
 		const wallet = await UserWallet.findOne({ user: userId });
+		logger.info(`>> depositing ${amount} funds to ${userId}`)
 		await wallet?.updateOne({
 			$set: {
 				balance: (wallet?.balance + amount)

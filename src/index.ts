@@ -23,3 +23,5 @@ app.use(renderScanRoutes);
 
 app.listen(PORT, () => init());
 
+export { app }
+

@@ -18,16 +18,16 @@ type RendleContestInput = {
 	contestants: RendleContestDocument['contestants'];
 };
 
-const createRendleContest = async () => {
+const createRendleContest = async (gameType: number) => {
 	try {
-		logger.info(`>> creating new contest`)
+		logger.info(`>> creating new contest for ${gameType}`)
 		const input: RendleContestInput = {
 			minimumContestants: 1,
 			prizePool: 0,
 			contestants: []
 		}
 		const contest = await RendleContest.create(input)
-		logger.info(`>> successfully created contest`)
+		logger.info(`>> successfully created contest ${contest._id}`)
 		return contest._id;
 	} catch (e) {
 		logger.error(e)
@@ -38,7 +38,7 @@ const createRendleGameType = async (rendleGameType: RendleGameType) => {
 	try {
 		logger.info(`>> creating rendle ${rendleGameType.gameType}`)
 		if (!rendleGameType.isExpired) {
-			const contestId = await createRendleContest();
+			const contestId = await createRendleContest(rendleGameType.gameType);
 			const input: RendleGameTypeInput = {
 				gameType: rendleGameType.gameType,
 				startsOn: rendleGameType.startsOn,

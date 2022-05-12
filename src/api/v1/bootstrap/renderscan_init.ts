@@ -35,6 +35,8 @@ type RenderScanContestInput = {
 
 const createRenderScanContest = async (renderScanRefWordAsInput: RenderScanRefWordInput) => {
 	try {
+
+		logger.info(">> creating refword for renderscan contest")
 		const refWord = await createRenderScanRefWord(renderScanRefWordAsInput)
 		const input: RenderScanContestInput = {
 			minimumContestants: 1,
@@ -55,6 +57,7 @@ const createRenderScanGameTypes = async (
 
 	try {
 		if (!renderScanGameType.isExpired) {
+			logger.info(">> creating free type contest")
 			const contestId = await createRenderScanContest(renderScanRefWordAsInput);
 			const input: RenderScanGameTypeInput = {
 				gameType: renderScanGameType.gameType,
@@ -65,6 +68,7 @@ const createRenderScanGameTypes = async (
 			}
 			await RenderScanGameType.create(input)
 		} else {
+			logger.info(">> creating paid type contest")
 			const input: RenderScanGameTypeInput = {
 				gameType: renderScanGameType.gameType,
 				startsOn: renderScanGameType.startsOn,
@@ -80,10 +84,11 @@ const createRenderScanGameTypes = async (
 }
 
 const initializeRenderScanGames = async (renderScanRefWordAsInput: RenderScanRefWordInput) => {
-	await RenderScanGameType.collection.drop()
+	logger.info(">> checking for renderscan collection")
 	const count = await (await RenderScanGameType.find()).length;
 	if (count <= 0) {
 		renderscanGameTypes.map((renderScanGameType) => {
+			logger.info(">> creating renderscan games")
 			createRenderScanGameTypes(renderScanGameType, renderScanRefWordAsInput);
 		})
 	}

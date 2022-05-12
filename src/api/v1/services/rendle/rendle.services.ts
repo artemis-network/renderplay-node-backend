@@ -184,8 +184,7 @@ const saveRendleContestResult = async (
 		// await RendleGameState.findOneAndRemove({ user: user?._id })
 		return { message: "Successfully Posted" }
 	} catch (error) {
-		console.log(error)
-		logger.error("👎 " + error)
+		logger.error(">> " + error)
 		return { message: "Something went wrong" }
 	}
 }
@@ -207,7 +206,6 @@ const getRendleParticipants = async (contestId: string) => {
 const getRendleGameStatus = async (userId: string, contestId: string, gameType: number) => {
 	try {
 		const contest = await RendleContest.findById(contestId)
-		const status = contest?.contestants?.find((result) => String(userId) === String(result?._id));
 		const result = await RendleResult.findOne({ user: userId })
 		if (result === null) return { isFirstGame: false }
 		else return {
