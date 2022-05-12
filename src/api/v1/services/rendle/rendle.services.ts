@@ -1,9 +1,9 @@
-import { db, RendleContestDocument } from '../../models/db'
-
-import { logger } from '../../utils/logger';
 import mongoose from 'mongoose'
 
-const { RendleGameType, RendleContest, User, UserWallet, RendleResult } = db;
+import { logger } from '../../utils/logger';
+import { db, RendleContestDocument } from '../../models/db'
+const { RendleGameType, RendleContest, User, UserWallet, RendleResult, } = db;
+
 
 type RendleContestInput = {
 	minimumContestants: RendleContestDocument['minimumContestants'];
@@ -23,10 +23,9 @@ const createRendleContest = async () => {
 	}
 }
 
-
 const getRendleGameTypes = async () => {
 	try {
-		const rendles = await RendleGameType.find();
+		const rendles = await RendleGameType.find().sort({ gameType: 1 });
 		return { rendleGameTypes: rendles }
 	} catch (e) {
 		return []
@@ -120,17 +119,17 @@ const resetRendlesGameTypes = async () => {
 }
 
 
-const enterIntoRendleContest = async (gameType: number, contestId: string, username: string, confirm: boolean) => {
+const enterIntoRendleContest = async (gameType: number, contestId: string, userId: string, confirm: boolean) => {
 	try {
-		const user: any = await User.findOne({ username: username })
+		const user: any = await User.findById(userId)
 		const contest = await RendleContest.findById(contestId)
 		const contestants = contest?.contestants;
-		contestants?.map((contestant) => {
-			if (String(contestant) === String(user?._id)) return { message: "Paid", "error": false }
-		})
+		const contestant = contestants?.find((contestant) => String(contestant) === String(userId))
+		if (contestant) return { message: "PAID", "error": false }
+
 		if (confirm) {
 			const rendleGameType = await RendleGameType.findOne({ gameType: gameType });
-			const userWallet = await UserWallet.findOne({ user: user?._id }) || null;
+			const userWallet = await UserWallet.findOne({ user: userId }) || null;
 			if ((rendleGameType?.entryFee || 0) > (userWallet?.balance || 0)) return { message: "insufficent funds", error: true }
 			contestants?.push(user);
 			await contest?.updateOne({
@@ -140,12 +139,12 @@ const enterIntoRendleContest = async (gameType: number, contestId: string, usern
 				}
 			})
 			await contest?.save()
-			userWallet?.updateOne({
+			await userWallet?.updateOne({
 				balance: (userWallet?.balance - (rendleGameType?.entryFee || 0))
 			})
-			return { message: "success", error: false }
+			return { message: "OK", error: false }
 		}
-		return { message: "user or contest does not exist", error: true }
+		return { message: "OK", error: false }
 	} catch (error) {
 		logger.error("error " + error)
 		return { message: `something went wrong ${error}`, error: true }
@@ -205,24 +204,21 @@ const getRendleParticipants = async (contestId: string) => {
 	}
 }
 
-const getRendleGameStatus = async (username: string, contestId: string, gameType: number) => {
+const getRendleGameStatus = async (userId: string, contestId: string, gameType: number) => {
 	try {
-		const user = await User.findOne({ username: username });
-		const results = await RendleResult.find().where({ user: user?._id })
-		return results.map((result, index) => {
-			if (String(result?.contestId) === contestId) {
-				return {
-					id: result?._id,
-					gameType: gameType,
-					startsOn: result?.startedOn,
-					completedOn: result?.completedOn,
-					isWon: result.isWon,
-					contestId: result.contestId,
-					isFirstGame: false
-				}
-			}
-			if (index === results?.length) return { isFirstGame: true }
-		})
+		const contest = await RendleContest.findById(contestId)
+		const status = contest?.contestants?.find((result) => String(userId) === String(result?._id));
+		const result = await RendleResult.findOne({ user: userId })
+		if (result === null) return { isFirstGame: false }
+		else return {
+			id: result?._id,
+			gameType: gameType,
+			startsOn: result?.startedOn,
+			completedOn: result?.completedOn,
+			isWon: result.isWon,
+			contestId: result.contestId,
+			isFirstGame: false
+		}
 	} catch (e) {
 		return { message: e }
 	}

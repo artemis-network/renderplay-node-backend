@@ -12,7 +12,7 @@ interface Result {
 const checkForAccountActivation = async (username: string, code: string) => {
 	const response: Result = {
 		error: false,
-		message: "Account Activated",
+		message: "account activated",
 		isActivated: true
 	}
 	const error: Result = {
@@ -27,12 +27,12 @@ const checkForAccountActivation = async (username: string, code: string) => {
 
 			for (let c in activationCodes) {
 				if (c === code) {
-					await user?.update({
+					await user?.updateOne({
 						$set: {
 							isActivated: true
 						}
 					});
-					user?.save()
+					await user?.save()
 					return response;
 				}
 			}
@@ -49,13 +49,13 @@ const verifyUserEmail = async (username: string, token: string) => {
 		const user = await User.findOne({ username: username })
 		if (!user?.$isEmpty) {
 			if (user?.token === token) {
-				user?.update({
+				user?.updateOne({
 					$set: {
 						token: "",
 						isVerified: true,
 					}
 				})
-				user?.save();
+				await user?.save();
 				return { message: "email verified", error: false }
 			}
 			return { message: "invalid token", error: true }

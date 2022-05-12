@@ -17,7 +17,10 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const logger_1 = require("../../utils/logger");
 const token_1 = require("../../utils/token");
 const jwt_1 = require("../../utils/jwt");
+const google_auth_library_1 = require("google-auth-library");
 // import { EmailSender, getEmailVerificationHTML } from '../../utils/email'
+const config_1 = require("../../../../config");
+const client = new google_auth_library_1.OAuth2Client(config_1.GOOGLE_OAUTH_CLIENT);
 const db_1 = require("../../models/db");
 const { User, UserWallet } = db_1.db;
 // const sendVerificationEmailForUser = async (token: string, email: string, username: string) => {
@@ -145,59 +148,68 @@ const loginUser = (username, password) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.loginUser = loginUser;
-const googleLogin = (email, username) => __awaiter(void 0, void 0, void 0, function* () {
+const googleLogin = (googleToken) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        logger_1.logger.info(">> creating user " + username + " >> ");
-        logger_1.logger.info(">> creating token for " + username + " >> ");
-        const userInput = {
-            username: username,
-            email: email,
-            password: "",
-            isActivated: false,
-            isGoogleAccount: true,
-            isVerified: false,
-            token: ""
-        };
-        const newUser = yield User.create(userInput);
-        logger_1.logger.info(">> user created " + username + " >> ");
-        createWalletForUser(newUser._id);
-        logger_1.logger.info(">> authentication successfully " + username + " >> ");
-        logger_1.logger.info(">> generating token " + username + " >> ");
-        const token = (0, jwt_1.generateJWTToken)("username");
-        logger_1.logger.info(">> sending resposne " + username + " >> ");
-        const result = {
-            error: false,
-            userId: newUser._id,
-            message: "SUCCESS",
-            username: newUser.username,
-            errorType: "NONE",
-            email: newUser.email,
-            accessToken: token,
-            publicToken: "[ADMIN]",
-            status: 200
-        };
-        return result;
+        const { payload } = yield client.verifyIdToken({ idToken: googleToken, audience: config_1.GOOGLE_OAUTH_CLIENT });
+        const { email, email_verified } = payload;
+        const username = email.split("@")[0];
+        if (email_verified) {
+            logger_1.logger.info(">> creating user " + username + " >> ");
+            logger_1.logger.info(">> creating token for " + username + " >> ");
+            const userInput = {
+                username: username,
+                email: email,
+                password: "",
+                isActivated: false,
+                isGoogleAccount: true,
+                isVerified: false,
+                token: ""
+            };
+            try {
+                const newUser = yield User.create(userInput);
+                logger_1.logger.info(">> user created " + username + " >> ");
+                createWalletForUser(newUser._id);
+                logger_1.logger.info(">> authentication successfully " + username + " >> ");
+                logger_1.logger.info(">> generating token " + username + " >> ");
+                const token = (0, jwt_1.generateJWTToken)("username");
+                logger_1.logger.info(">> sending resposne " + username + " >> ");
+                const result = {
+                    error: false,
+                    userId: newUser._id,
+                    message: "SUCCESS",
+                    username: newUser.username,
+                    errorType: "NONE",
+                    email: newUser.email,
+                    accessToken: token,
+                    publicToken: "[ADMIN]",
+                    status: 200
+                };
+                return result;
+            }
+            catch (err) {
+                if (err["code"] === 11000) {
+                    const user = yield User.findOne({ email: email });
+                    logger_1.logger.info(">> generating token " + username + " >> ");
+                    const token = (0, jwt_1.generateJWTToken)(username);
+                    logger_1.logger.info(">> sending resposne " + username + " >> ");
+                    const response = {
+                        error: false,
+                        userId: user === null || user === void 0 ? void 0 : user._id,
+                        message: "SUCCESS",
+                        username: username,
+                        email: email,
+                        accessToken: token,
+                        publicToken: "[ADMIN]",
+                        status: 200,
+                        errorType: "NONE"
+                    };
+                    return response;
+                }
+            }
+        }
     }
     catch (err) {
         logger_1.logger.error(err);
-        if (err["code"] === 11000) {
-            const user = yield User.findOne({ email: email });
-            logger_1.logger.info(">> generating token " + username + " >> ");
-            const token = (0, jwt_1.generateJWTToken)(username);
-            logger_1.logger.info(">> sending resposne " + username + " >> ");
-            const response = {
-                error: false,
-                userId: user === null || user === void 0 ? void 0 : user._id,
-                message: "SUCCESS",
-                username: username,
-                email: email,
-                accessToken: token,
-                publicToken: "[ADMIN]",
-                status: 200,
-                errorType: "NONE"
-            };
-            return response;
-        }
     }
 });
 exports.googleLogin = googleLogin;

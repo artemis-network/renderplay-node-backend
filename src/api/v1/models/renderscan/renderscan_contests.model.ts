@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
-import { UserDocument } from './user.model'
+import { UserDocument } from '../user.model'
 import { RenderScanRefWordDocument } from './renderscan_ref_word.modal'
 
 type RenderScanContestDocument = Document & {
@@ -22,5 +22,3 @@ const renderScanContestSchema = new Schema(
 const RenderScanContest: Model<RenderScanContestDocument> = mongoose.model<RenderScanContestDocument>('RenderScanContest', renderScanContestSchema);
 
 export { RenderScanContest, RenderScanContestDocument };
-
-

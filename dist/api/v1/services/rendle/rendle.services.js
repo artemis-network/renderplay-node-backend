@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRendleGameStatus = exports.getRendleContestants = exports.getRendleParticipants = exports.saveRendleContestResult = exports.enterIntoRendleContest = exports.resetRendlesGameTypes = exports.getRendleGameTypes = void 0;
-const db_1 = require("../../models/db");
-const logger_1 = require("../../utils/logger");
 const mongoose_1 = __importDefault(require("mongoose"));
-const { RendleGameType, RendleContest, User, UserWallet, RendleResult } = db_1.db;
+const logger_1 = require("../../utils/logger");
+const db_1 = require("../../models/db");
+const { RendleGameType, RendleContest, User, UserWallet, RendleResult, } = db_1.db;
 const createRendleContest = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const input = {
@@ -32,7 +32,7 @@ const createRendleContest = () => __awaiter(void 0, void 0, void 0, function* ()
 });
 const getRendleGameTypes = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const rendles = yield RendleGameType.find();
+        const rendles = yield RendleGameType.find().sort({ gameType: 1 });
         return { rendleGameTypes: rendles };
     }
     catch (e) {
@@ -44,8 +44,7 @@ const resetRendlesGameTypes = () => __awaiter(void 0, void 0, void 0, function* 
     try {
         // await Words.collection.drop()
         // await RendleGameState.collection.drop()
-        const rendles = yield RendleGameType.find().sort({ gameType: -1 });
-        rendles.reverse();
+        const rendles = yield RendleGameType.find().sort({ gameType: 1 });
         rendles.map((rendle, index) => __awaiter(void 0, void 0, void 0, function* () {
             if (rendle.isExpired === true) {
                 if (index === rendles.length - 1) {
@@ -128,17 +127,17 @@ const resetRendlesGameTypes = () => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.resetRendlesGameTypes = resetRendlesGameTypes;
-const enterIntoRendleContest = (gameType, contestId, username, confirm) => __awaiter(void 0, void 0, void 0, function* () {
+const enterIntoRendleContest = (gameType, contestId, userId, confirm) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield User.findOne({ username: username });
+        const user = yield User.findById(userId);
         const contest = yield RendleContest.findById(contestId);
         const contestants = contest === null || contest === void 0 ? void 0 : contest.contestants;
-        // contestants?.map((contestant) => {
-        // 	if (contestant === user?._id) return { message: "Paid", "error": false }
-        // })
+        const contestant = contestants === null || contestants === void 0 ? void 0 : contestants.find((contestant) => String(contestant) === String(userId));
+        if (contestant)
+            return { message: "PAID", "error": false };
         if (confirm) {
             const rendleGameType = yield RendleGameType.findOne({ gameType: gameType });
-            const userWallet = (yield UserWallet.findOne({ user: user === null || user === void 0 ? void 0 : user._id })) || null;
+            const userWallet = (yield UserWallet.findOne({ user: userId })) || null;
             if (((rendleGameType === null || rendleGameType === void 0 ? void 0 : rendleGameType.entryFee) || 0) > ((userWallet === null || userWallet === void 0 ? void 0 : userWallet.balance) || 0))
                 return { message: "insufficent funds", error: true };
             contestants === null || contestants === void 0 ? void 0 : contestants.push(user);
@@ -149,12 +148,12 @@ const enterIntoRendleContest = (gameType, contestId, username, confirm) => __awa
                 }
             }));
             yield (contest === null || contest === void 0 ? void 0 : contest.save());
-            userWallet === null || userWallet === void 0 ? void 0 : userWallet.updateOne({
+            yield (userWallet === null || userWallet === void 0 ? void 0 : userWallet.updateOne({
                 balance: ((userWallet === null || userWallet === void 0 ? void 0 : userWallet.balance) - ((rendleGameType === null || rendleGameType === void 0 ? void 0 : rendleGameType.entryFee) || 0))
-            });
-            return { message: "success", error: false };
+            }));
+            return { message: "OK", error: false };
         }
-        return { message: "user or contest does not exist", error: true };
+        return { message: "OK", error: false };
     }
     catch (error) {
         logger_1.logger.error("error " + error);
@@ -213,9 +212,24 @@ const getRendleParticipants = (contestId) => __awaiter(void 0, void 0, void 0, f
     }
 });
 exports.getRendleParticipants = getRendleParticipants;
-const getRendleGameStatus = (username, contestId, gameType) => __awaiter(void 0, void 0, void 0, function* () {
+const getRendleGameStatus = (userId, contestId, gameType) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
-        const user = yield User.findOne({ username: username });
+        const contest = yield RendleContest.findById(contestId);
+        const status = (_a = contest === null || contest === void 0 ? void 0 : contest.contestants) === null || _a === void 0 ? void 0 : _a.find((result) => String(userId) === String(result === null || result === void 0 ? void 0 : result._id));
+        const result = yield RendleResult.findOne({ user: userId });
+        if (result === null)
+            return { isFirstGame: false };
+        else
+            return {
+                id: result === null || result === void 0 ? void 0 : result._id,
+                gameType: gameType,
+                startsOn: result === null || result === void 0 ? void 0 : result.startedOn,
+                completedOn: result === null || result === void 0 ? void 0 : result.completedOn,
+                isWon: result.isWon,
+                contestId: result.contestId,
+                isFirstGame: false
+            };
     }
     catch (e) {
         return { message: e };

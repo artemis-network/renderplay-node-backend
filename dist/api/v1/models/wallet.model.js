@@ -29,7 +29,7 @@ const UserWalletSchema = new mongoose_1.Schema({
     balance: {
         type: mongoose_1.Schema.Types.Number,
         required: true,
-        default: 0
+        default: 10000
     },
     isActive: {
         type: mongoose_1.Schema.Types.Boolean,

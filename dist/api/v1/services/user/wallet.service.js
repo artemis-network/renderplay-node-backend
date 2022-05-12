@@ -12,10 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.depositFunds = exports.getWallet = void 0;
 const db_1 = require("../../models/db");
 const { User, UserWallet } = db_1.db;
-const getWallet = (username) => __awaiter(void 0, void 0, void 0, function* () {
+const getWallet = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield User.findOne({ username: username });
-        const wallet = yield UserWallet.findOne({ user: user === null || user === void 0 ? void 0 : user._id });
+        const wallet = yield UserWallet.findOne({ user: userId });
         const result = {
             error: false,
             message: "SUCCESS",
@@ -28,10 +27,12 @@ const getWallet = (username) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getWallet = getWallet;
-const depositFunds = (username, amount) => __awaiter(void 0, void 0, void 0, function* () {
+const depositFunds = (userId, amount) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield User.findOne({ username: username });
-        const wallet = yield UserWallet.findOne({ user: user === null || user === void 0 ? void 0 : user._id });
+        const wallets = yield UserWallet.find();
+        console.log(wallets);
+        console.log(userId);
+        const wallet = yield UserWallet.findOne({ user: userId });
         yield (wallet === null || wallet === void 0 ? void 0 : wallet.update({
             $set: {
                 balance: ((wallet === null || wallet === void 0 ? void 0 : wallet.balance) + amount)
@@ -41,7 +42,7 @@ const depositFunds = (username, amount) => __awaiter(void 0, void 0, void 0, fun
         return { message: "Funds Added!", balance: wallet === null || wallet === void 0 ? void 0 : wallet.balance };
     }
     catch (e) {
-        throw new Error("");
+        console.log(e);
     }
 });
 exports.depositFunds = depositFunds;

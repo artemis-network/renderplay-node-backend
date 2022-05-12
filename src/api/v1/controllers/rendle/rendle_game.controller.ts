@@ -30,8 +30,8 @@ const resetRendlesGameTypesController = async (req: Request, res: Response) => {
 
 const enterRendlesContestController = async (req: Request, res: Response) => {
 	try {
-		const { gameType, contestId, username, confirm } = req.body
-		const response = await enterIntoRendleContest(gameType, contestId, username, confirm);
+		const { gameType, contestId, userId, confirm } = req.body
+		const response = await enterIntoRendleContest(gameType, contestId, userId, confirm);
 		return res.status(200).json(response)
 	} catch (error) {
 		return res.status(200).json({ message: "Not OK" })
@@ -70,8 +70,8 @@ const getRendleContestantsController = async (req: Request, res: Response) => {
 
 const getRendleGameStatusController = async (req: Request, res: Response) => {
 	try {
-		const { username, contestId, gameType } = req.body
-		const response = await getRendleGameStatus(username, contestId, gameType);
+		const { userId, contestId, gameType } = req.body
+		const response = await getRendleGameStatus(userId, contestId, gameType);
 		return res.status(200).json(response)
 	} catch (error) {
 		return res.status(200).json({ message: error })
@@ -85,6 +85,5 @@ export {
 	saveRendleContestResultController,
 	getRendleParticipantsController,
 	getRendleContestantsController,
-	getRendleGameStatusController
-
+	getRendleGameStatusController,
 }

@@ -13,8 +13,8 @@ exports.depositFundsController = exports.getWalletController = void 0;
 const wallet_service_1 = require("../../services/user/wallet.service");
 const getWalletController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { username } = req.body;
-        const result = yield (0, wallet_service_1.getWallet)(username);
+        const { userId } = req.body;
+        const result = yield (0, wallet_service_1.getWallet)(userId);
         return res.status(200).json(result);
     }
     catch (e) {
@@ -24,9 +24,9 @@ const getWalletController = (req, res) => __awaiter(void 0, void 0, void 0, func
 exports.getWalletController = getWalletController;
 const depositFundsController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { username, amount, password } = req.body;
+        const { userId, amount, password } = req.body;
         if (password === "password@1234") {
-            const result = yield (0, wallet_service_1.depositFunds)(username, amount);
+            const result = yield (0, wallet_service_1.depositFunds)(userId, amount);
             return res.status(200).json(result);
         }
         return res.status(200).json({ message: "invalid password", error: true });

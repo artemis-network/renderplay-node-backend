@@ -4,13 +4,11 @@ import multer from 'multer';
 const router = express.Router();
 
 import {
-	initializeRenderScanGamesController,
 	enterIntoRenderScanContestController,
 	getRenderScanContestantsController,
 	getRenderScanParticipantsController,
 	saveRenderScanContestResultController
 } from '../controllers/renderscan/renderscan.controller'
-
 
 
 const fileStorageEngine = multer.diskStorage({
@@ -25,7 +23,6 @@ const fileStorageEngine = multer.diskStorage({
 const upload = multer({ storage: fileStorageEngine })
 
 
-router.post('/api/v1/renderscan/init', upload.single("image"), initializeRenderScanGamesController);
 router.post('/api/v1/renderscan/enter', enterIntoRenderScanContestController);
 router.post('/api/v1/renderscan/save', upload.single("image"), saveRenderScanContestResultController);
 router.post('/api/v1/renderscan/contestants', getRenderScanContestantsController);

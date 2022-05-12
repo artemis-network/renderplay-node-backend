@@ -1,7 +1,7 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
 import { RenderScanDocument } from './renderscan.model'
 import { RenderScanContestDocument } from './renderscan_contests.model'
-import { UserDocument } from './user.model';
+import { UserDocument } from '../user.model';
 
 type RenderScanResultsDocument = Document & {
 	contestId: RenderScanContestDocument;
@@ -17,7 +17,7 @@ const renderScanResultsSchema = new Schema(
 	},
 );
 
-const RenderScanResults: Model<RenderScanResultsDocument> = mongoose.model<RenderScanResultsDocument>('RendleScanResults', renderScanResultsSchema);
+const RenderScanResults: Model<RenderScanResultsDocument> = mongoose.model<RenderScanResultsDocument>('RenderScanResults', renderScanResultsSchema);
 
 export { RenderScanResults, RenderScanResultsDocument };
 

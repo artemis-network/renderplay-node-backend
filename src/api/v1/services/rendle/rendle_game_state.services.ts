@@ -1,57 +1,55 @@
-import { db, WordsDocument, RendleGameStateDocument } from '../../models/db'
-
-
-const { RendleGameState, User, Words } = db;
-import { logger } from '../../utils/logger';
+import { db, RendleGameStateDocument, RendleWordDocument } from '../../models/db'
+const { RendleGameState, RendleWord } = db;
 
 type RendleGameStateInput = {
-	user: RendleGameStateDocument['user'];
+	userId: RendleGameStateDocument['userId'];
+	contestId: RendleGameStateDocument['contestId']
 	words: RendleGameStateDocument['words']
 };
-type WordsInputs = {
-	guess: WordsDocument['guess']
-}
 
-
-const updateCurrentGuesses = async (username: string, word: string, gameStateId: string) => {
+const updateCurrentGuesses = async (userId: string, contestId: string, word: string, gameStateId: string) => {
 	try {
-		const user = await User.findOne({ username: username })
-		const wordInput: WordsInputs = { guess: word }
-		const newWord = await Words.create(wordInput)
-		if (gameStateId === null) {
-			const wordsList = []
-			wordsList.push(newWord)
-			const input: RendleGameStateInput = {
-				user: user?._id,
-				words: wordsList
-			}
-			await RendleGameState.create(input)
-			return { message: "Successfully created new guess" }
-		} else {
-			const gameState = await RendleGameState.findById(gameStateId)
+		const rendleWord = await RendleWord.create({ guess: word })
+		const gameState = await RendleGameState.findOne({ userId: userId })
+		if (gameState !== null) {
 			await gameState?.updateOne({
 				$set: {
-					words: [...gameState?.words, newWord]
+					words: [...gameState.words, rendleWord]
 				}
 			})
-			return { message: "Successfully updated guess" }
+			await gameState?.save()
+			return { message: "Successfully updated guess", gameStateId: gameState?._id }
+		} else {
+			const wordList = [];
+			wordList.push(rendleWord)
+			const input: RendleGameStateInput = {
+				contestId: contestId,
+				userId: userId,
+				words: wordList
+			}
+			const { _id } = await RendleGameState.create(input)
+			return { message: "Successfully created new guess", gameStateId: _id }
 		}
 	} catch (error) {
+		console.log(error)
 		return { message: `Something went wrong ${error}` }
 	}
 }
 
 
-const getRendleCurrentGuesses = async (username: string) => {
+const getRendleCurrentGuesses = async (userId: string) => {
 	try {
-		const user = await User.findOne({ username: username })
-		const gameState = await RendleGameState.findOne({ user: user?._id })
-		return { gameState: gameState };
+		const gameState: any = await RendleGameState.findOne({ userId: userId }).populate('words').exec()
+		const words = await gameState?.words;
+		const guesses: string[] = []
+		for (let i = 0; i < words.length; i++) {
+			guesses.push(await words[i].guess)
+		}
+		return { guesses: guesses }
 	} catch (error) {
 		return { message: `Something went wrong ${error}` }
 	}
 }
-
 
 export {
 	updateCurrentGuesses,

@@ -5,7 +5,7 @@ import { logger } from '../utils/logger'
 
 const { RenderScanGameType, RenderScanContest, RenderScanRefWord } = db
 
-type RenderScanRefWordInput = {
+export type RenderScanRefWordInput = {
 	word: RenderScanRefWordDocument['word'],
 	image: RenderScanRefWordDocument['image'],
 }
@@ -87,7 +87,6 @@ const initializeRenderScanGames = async (renderScanRefWordAsInput: RenderScanRef
 			createRenderScanGameTypes(renderScanGameType, renderScanRefWordAsInput);
 		})
 	}
-	return { message: "Successful" }
 }
 
 export { initializeRenderScanGames }

@@ -12,6 +12,6 @@ const renderScanRefWordSchema = new Schema(
 	},
 );
 
-const RenderScanRefWord: Model<RenderScanRefWordDocument> = mongoose.model<RenderScanRefWordDocument>('RendleScanRefWord', renderScanRefWordSchema);
+const RenderScanRefWord: Model<RenderScanRefWordDocument> = mongoose.model<RenderScanRefWordDocument>('RenderScanRefWord', renderScanRefWordSchema);
 
 export { RenderScanRefWord, RenderScanRefWordDocument };

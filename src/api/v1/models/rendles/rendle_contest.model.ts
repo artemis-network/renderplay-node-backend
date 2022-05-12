@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
-import { UserDocument } from './user.model'
+import { UserDocument } from '../user.model'
 
 type RendleContestDocument = Document & {
 	minimumContestants: number;

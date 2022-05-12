@@ -24,8 +24,8 @@ const createUserController = (req, res) => __awaiter(void 0, void 0, void 0, fun
 exports.createUserController = createUserController;
 const createGoogleUserController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { username, email } = req.body;
-        const result = yield (0, user_service_1.googleLogin)(username, email);
+        const { token } = req.body;
+        const result = yield (0, user_service_1.googleLogin)(token);
         return res.status(200).json(result);
     }
     catch (e) {

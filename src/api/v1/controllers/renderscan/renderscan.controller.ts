@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
 
-import { initializeRenderScanGames } from '../../bootstrap/renderscan_init'
-
 import {
 	enterIntoRenderScanContest,
 	getRenderScanContestants,
@@ -9,21 +7,6 @@ import {
 	saveRenderScanContestResult
 } from '../../services/renderscan/renderscan.services'
 
-
-const initializeRenderScanGamesController = async (req: Request, res: Response) => {
-	try {
-		const { word } = req.body;
-		const image = req.file?.destination + "/" + req.file?.filename || '';
-		const refWord = {
-			word,
-			image
-		}
-		const response = await initializeRenderScanGames(refWord);
-		res.status(200).json(response)
-	} catch (e) {
-		res.status(200).json(e)
-	}
-}
 
 const enterIntoRenderScanContestController = async (req: Request, res: Response) => {
 	try {
@@ -67,7 +50,6 @@ const getRenderScanParticipantsController = async (req: Request, res: Response) 
 }
 
 export {
-	initializeRenderScanGamesController,
 	saveRenderScanContestResultController,
 	enterIntoRenderScanContestController,
 	getRenderScanContestantsController,

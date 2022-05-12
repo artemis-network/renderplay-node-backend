@@ -10,7 +10,6 @@ type UserDocument = Document & {
   token: String
 };
 
-
 const userSchema = new Schema(
   {
     username: {

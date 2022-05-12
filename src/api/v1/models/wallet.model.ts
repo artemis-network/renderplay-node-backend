@@ -11,7 +11,7 @@ const UserWalletSchema = new Schema(
 		balance: {
 			type: Schema.Types.Number,
 			required: true,
-			default: 0
+			default: 10000
 		},
 		isActive: {
 			type: Schema.Types.Boolean,

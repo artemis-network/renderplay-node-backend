@@ -16,11 +16,13 @@ const logger_1 = require("../utils/logger");
 const { RendleGameType, RendleContest } = db_1.db;
 const createRendleContest = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        logger_1.logger.info(`>> creating new contest`);
         const input = {
             minimumContestants: 1,
             prizePool: 0
         };
         const contest = yield RendleContest.create(input);
+        logger_1.logger.info(`>> successfully created contest`);
         return contest._id;
     }
     catch (e) {
@@ -29,6 +31,7 @@ const createRendleContest = () => __awaiter(void 0, void 0, void 0, function* ()
 });
 const createRendleGameType = (rendleGameType) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        logger_1.logger.info(`>> creating rendle ${rendleGameType.gameType}`);
         if (!rendleGameType.isExpired) {
             const contestId = yield createRendleContest();
             const input = {
@@ -50,14 +53,17 @@ const createRendleGameType = (rendleGameType) => __awaiter(void 0, void 0, void 
             };
             yield RendleGameType.create(input);
         }
+        logger_1.logger.info(`>> created rendle ${rendleGameType.gameType}`);
     }
     catch (e) {
         logger_1.logger.error(e);
     }
 });
 const initializeRendleGames = () => __awaiter(void 0, void 0, void 0, function* () {
+    logger_1.logger.info(">> checking for rendles collection");
     const count = yield (yield RendleGameType.find()).length;
     if (count <= 0) {
+        logger_1.logger.info(">> creating rendles");
         rendleGameTypes_1.rendleGameTypes.map((rendleGameType) => {
             createRendleGameType(rendleGameType);
         });

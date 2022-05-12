@@ -13,8 +13,8 @@ const createUserController = async (req: Request, res: Response) => {
 
 const createGoogleUserController = async (req: Request, res: Response) => {
 	try {
-		const { username, email, token } = req.body;
-		const result = await googleLogin(username, email, token)
+		const { token } = req.body;
+		const result = await googleLogin(token)
 		return res.status(200).json(result)
 	} catch (e) {
 		return res.status(200).json(e);

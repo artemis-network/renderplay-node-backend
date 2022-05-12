@@ -4,22 +4,27 @@ import { logger } from '../utils/logger';
 
 import { User, UserDocument } from './user.model'
 import { UserWallet, UserWalletDocument } from './wallet.model'
-import { RendleGameType, RendleGameTypeDocument, } from './rendle_game_type.model'
-import { RendleContest, RendleContestDocument } from './rendle_contest.model'
-import { RendleResult, RendleResultsDocument, } from './rendle_results.model'
-import { RenderverseEmails, RenderverseEmailsDocument, } from './rendervers_emails.model'
-import { RendleGameState, RendleGameStateDocument, Words, WordsDocument, } from './rendle_game_state.model'
 
-import { RenderScan, RenderScanDocument } from './renderscan.model'
-import { RenderScanContest, RenderScanContestDocument } from './renderscan_contests.model'
-import { RenderScanGameType, RenderScanGameTypeDocument } from './renderscan_game_type.modal'
-import { RenderScanRefWord, RenderScanRefWordDocument } from './renderscan_ref_word.modal'
-import { RenderScanResults, RenderScanResultsDocument } from './renderscan_results'
+import { RenderverseEmails, RenderverseEmailsDocument, } from './rendervers_emails.model'
+
+import { RendleWord, RendleWordDocument, } from './rendles/rendle_word.model'
+import { RendleContest, RendleContestDocument } from './rendles/rendle_contest.model'
+import { RendleResult, RendleResultsDocument, } from './rendles/rendle_results.model'
+import { RendleGameType, RendleGameTypeDocument, } from './rendles/rendle_game_type.model'
+import { RendleGameState, RendleGameStateDocument, } from './rendles/rendle_game_state.model'
+
+import { RenderScan, RenderScanDocument } from './renderscan/renderscan.model'
+import { RenderScanRefWord, RenderScanRefWordDocument } from './renderscan/renderscan_ref_word.modal'
+import { RenderScanResults, RenderScanResultsDocument } from './renderscan/renderscan_results'
+import { RenderScanContest, RenderScanContestDocument } from './renderscan/renderscan_contests.model'
+import { RenderScanGameType, RenderScanGameTypeDocument } from './renderscan/renderscan_game_type.modal'
+
+import { MONGO_DB_URL } from '../../../config'
 
 mongoose
 	.connect
 	(
-		'mongodb://artemisnetwork:Artemis%40123@3.108.106.111:27017/renderverse?authMechanism=DEFAULT',
+		MONGO_DB_URL,
 		{
 			useCreateIndex: true,
 			useNewUrlParser: true,
@@ -33,7 +38,7 @@ mongoose
 	.connection
 	.on('open', () => logger.info('🚀  Database connected Successfully'))
 	.on('error', (err) => logger.error("👉  Error" + err))
-	.on('disconnected', () => console.warn('🚨  Database disconnected...'));
+	.on('disconnected', () => logger.warn('🚨  Database disconnected...'));
 
 const db = {
 	mongoose,
@@ -43,7 +48,7 @@ const db = {
 	UserWallet,
 
 	// Rendle Models
-	Words,
+	RendleWord,
 	RendleResult,
 	RendleContest,
 	RendleGameType,
@@ -60,18 +65,19 @@ const db = {
 
 export {
 	db,
+	// Renderverse Emails
+	RenderverseEmailsDocument,
 
 	// User Docs
 	UserDocument,
 	UserWalletDocument,
 
 	// Rendle Docs
-	WordsDocument,
 	RendleResultsDocument,
 	RendleContestDocument,
 	RendleGameTypeDocument,
 	RendleGameStateDocument,
-	RenderverseEmailsDocument,
+	RendleWordDocument,
 
 	// Renderscan Docs
 	RenderScanDocument,

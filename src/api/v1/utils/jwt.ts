@@ -1,4 +1,5 @@
 import { encode, decode, TAlgorithm } from "jwt-simple";
+import { JWT_SECRET } from '../../../config'
 
 const generateJWTToken = (session: string): string => {
 	// Always use HS512 to sign the token
@@ -12,10 +13,10 @@ const generateJWTToken = (session: string): string => {
 		issued: issued,
 		expires: expires
 	};
-	return encode(encoded, "SECRET", algorithm);
+	return encode(encoded, JWT_SECRET, algorithm);
 }
 
-const decodeJWTToken = (token: string) => decode(token, "SECRET");
+const decodeJWTToken = (token: string) => decode(token, JWT_SECRET);
 
 export {
 	generateJWTToken,

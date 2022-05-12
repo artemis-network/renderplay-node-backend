@@ -5,13 +5,9 @@ import { createToken } from '../../utils/token'
 import { generateJWTToken, decodeJWTToken } from '../../utils/jwt';
 import { OAuth2Client } from 'google-auth-library'
 // import { EmailSender, getEmailVerificationHTML } from '../../utils/email'
+import { GOOGLE_OAUTH_CLIENT } from '../../../../config'
 
-const client: any = new OAuth2Client(
-	"461311621504-7qc2ioaio08dvv3f2q2f5l25rm0ct0to.apps.googleusercontent.com",
-	"CLIENT_SCRET",
-	"REDIRECT URL"
-)
-
+const client: any = new OAuth2Client(GOOGLE_OAUTH_CLIENT)
 
 import { UserDocument, UserWalletDocument, db } from '../../models/db'
 const { User, UserWallet } = db;
@@ -90,6 +86,7 @@ const createUser = async (username: string, email: string, password: string) => 
 			isVerified: false,
 			token: token
 		};
+
 		const newUser = await User.create(userInput);
 		logger.info(">> user created " + username + " >> ");
 		createWalletForUser(newUser._id)
@@ -178,60 +175,67 @@ const loginUser = async (username: string, password: string) => {
 	}
 }
 
-const googleLogin = async (email: string, username: string, googleToken: string) => {
+const googleLogin = async (googleToken: string) => {
 	try {
-		await client.VerifyIdToken(googleToken)
-		logger.info(">> creating user " + username + " >> ");
-		logger.info(">> creating token for " + username + " >> ");
-		const userInput: UserInput = {
-			username: username,
-			email: email,
-			password: "",
-			isActivated: false,
-			isGoogleAccount: true,
-			isVerified: false,
-			token: ""
-		};
-		const newUser = await User.create(userInput)
-		logger.info(">> user created " + username + " >> ");
-		createWalletForUser(newUser._id)
-		logger.info(">> authentication successfully " + username + " >> ");
-		logger.info(">> generating token " + username + " >> ");
-		const token: string = generateJWTToken("username");
-		logger.info(">> sending resposne " + username + " >> ");
-
-		const result: Result = {
-			error: false,
-			userId: newUser._id,
-			message: "SUCCESS",
-			username: newUser.username,
-			errorType: "NONE",
-			email: newUser.email,
-			accessToken: token,
-			publicToken: "[ADMIN]",
-			status: 200
-		};
-		return result;
-	} catch (err: any) {
-		logger.error(err);
-		if (err["code"] === 11000) {
-			const user = await User.findOne({ email: email })
-			logger.info(">> generating token " + username + " >> ");
-			const token: string = generateJWTToken(username);
-			logger.info(">> sending resposne " + username + " >> ");
-			const response: Result = {
-				error: false,
-				userId: user?._id,
-				message: "SUCCESS",
+		const { payload } = await client.verifyIdToken({ idToken: googleToken, audience: GOOGLE_OAUTH_CLIENT })
+		const { email, email_verified } = payload
+		const username = email.split("@")[0]
+		if (email_verified) {
+			logger.info(">> creating user " + username + " >> ");
+			logger.info(">> creating token for " + username + " >> ");
+			const userInput: UserInput = {
 				username: username,
 				email: email,
-				accessToken: token,
-				publicToken: "[ADMIN]",
-				status: 200,
-				errorType: "NONE"
+				password: "",
+				isActivated: false,
+				isGoogleAccount: true,
+				isVerified: false,
+				token: ""
+			};
+			try {
+				const newUser = await User.create(userInput)
+				logger.info(">> user created " + username + " >> ");
+				createWalletForUser(newUser._id)
+				logger.info(">> authentication successfully " + username + " >> ");
+				logger.info(">> generating token " + username + " >> ");
+				const token: string = generateJWTToken("username");
+				logger.info(">> sending resposne " + username + " >> ");
+
+				const result: Result = {
+					error: false,
+					userId: newUser._id,
+					message: "SUCCESS",
+					username: newUser.username,
+					errorType: "NONE",
+					email: newUser.email,
+					accessToken: token,
+					publicToken: "[ADMIN]",
+					status: 200
+				};
+				return result;
+			} catch (err: any) {
+				if (err["code"] === 11000) {
+					const user = await User.findOne({ email: email })
+					logger.info(">> generating token " + username + " >> ");
+					const token: string = generateJWTToken(username);
+					logger.info(">> sending resposne " + username + " >> ");
+					const response: Result = {
+						error: false,
+						userId: user?._id,
+						message: "SUCCESS",
+						username: username,
+						email: email,
+						accessToken: token,
+						publicToken: "[ADMIN]",
+						status: 200,
+						errorType: "NONE"
+					}
+					return response;
+				}
 			}
-			return response;
 		}
+	} catch (err: any) {
+		logger.error(err);
 	}
 
 }

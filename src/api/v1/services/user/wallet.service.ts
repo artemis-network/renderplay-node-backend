@@ -1,5 +1,4 @@
 import { db } from "../../models/db"
-
 const { User, UserWallet } = db
 
 interface Result {
@@ -8,10 +7,9 @@ interface Result {
 	balance?: number;
 }
 
-const getWallet = async (username: string) => {
+const getWallet = async (userId: string) => {
 	try {
-		const user = await User.findOne({ username: username });
-		const wallet = await UserWallet.findOne({ user: user?._id })
+		const wallet = await UserWallet.findOne({ user: userId })
 		const result: Result = {
 			error: false,
 			message: "SUCCESS",
@@ -23,11 +21,10 @@ const getWallet = async (username: string) => {
 	}
 }
 
-const depositFunds = async (username: string, amount: number) => {
+const depositFunds = async (userId: string, amount: number) => {
 	try {
-		const user = await User.findOne({ username: username });
-		const wallet = await UserWallet.findOne({ user: user?._id });
-		await wallet?.update({
+		const wallet = await UserWallet.findOne({ user: userId });
+		await wallet?.updateOne({
 			$set: {
 				balance: (wallet?.balance + amount)
 			}
@@ -35,7 +32,7 @@ const depositFunds = async (username: string, amount: number) => {
 		await wallet?.save()
 		return { message: "Funds Added!", balance: wallet?.balance }
 	} catch (e) {
-		throw new Error("")
+		console.log(e)
 	}
 }
 

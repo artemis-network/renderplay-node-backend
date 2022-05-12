@@ -11,22 +11,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmailSender = exports.getEmailVerificationHTML = void 0;
 class EmailSender {
-    getTransporter() {
-        // return nodemailer.createTransport({
-        // 	host: "smtp.office365.com",
-        // 	port: 25,
-        // 	secure: false,
-        // 	debug: true,
-        // 	logger: true,
-        // 	tls: {
-        // 		ciphers: 'SSLv3'
-        // 	},
-        // 	auth: {
-        // 		user: 'contact@renderverse.io',
-        // 		pass: 'Artemis@123',
-        // 	},
-        // });
-    }
+    // private getTransporter() {
+    // 	return nodemailer.createTransport({
+    // 		host: EMAIL_CONFIG.host,
+    // 		port: Number(EMAIL_CONFIG.port),
+    // 		secure: false,
+    // 		debug: true,
+    // 		logger: true,
+    // 		tls: {
+    // 			ciphers: 'SSLv3'
+    // 		},
+    // 		auth: {
+    // 			user: EMAIL_CONFIG.username,
+    // 			pass: EMAIL_CONFIG.password,
+    // 		},
+    // 	});
+    // }
     sendEmailVerificationEmail(from, to, subject, text, html) {
         return __awaiter(this, void 0, void 0, function* () {
             // return await this.getTransporter().sendMail({

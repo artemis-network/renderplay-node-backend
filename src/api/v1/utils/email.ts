@@ -1,23 +1,24 @@
 import nodemailer from 'nodemailer';
+import { EMAIL_CONFIG } from '../../../config'
 
 class EmailSender {
 
-	private getTransporter() {
-		// return nodemailer.createTransport({
-		// 	host: "smtp.office365.com",
-		// 	port: 25,
-		// 	secure: false,
-		// 	debug: true,
-		// 	logger: true,
-		// 	tls: {
-		// 		ciphers: 'SSLv3'
-		// 	},
-		// 	auth: {
-		// 		user: 'contact@renderverse.io',
-		// 		pass: 'Artemis@123',
-		// 	},
-		// });
-	}
+	// private getTransporter() {
+	// 	return nodemailer.createTransport({
+	// 		host: EMAIL_CONFIG.host,
+	// 		port: Number(EMAIL_CONFIG.port),
+	// 		secure: false,
+	// 		debug: true,
+	// 		logger: true,
+	// 		tls: {
+	// 			ciphers: 'SSLv3'
+	// 		},
+	// 		auth: {
+	// 			user: EMAIL_CONFIG.username,
+	// 			pass: EMAIL_CONFIG.password,
+	// 		},
+	// 	});
+	// }
 
 	async sendEmailVerificationEmail(from: string, to: string, subject: string, text: string, html: string) {
 		// return await this.getTransporter().sendMail({

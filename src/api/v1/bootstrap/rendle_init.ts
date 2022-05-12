@@ -15,15 +15,19 @@ type RendleGameTypeInput = {
 type RendleContestInput = {
 	minimumContestants: RendleContestDocument['minimumContestants'];
 	prizePool: RendleContestDocument['prizePool'];
+	contestants: RendleContestDocument['contestants'];
 };
 
 const createRendleContest = async () => {
 	try {
+		logger.info(`>> creating new contest`)
 		const input: RendleContestInput = {
 			minimumContestants: 1,
-			prizePool: 0
+			prizePool: 0,
+			contestants: []
 		}
 		const contest = await RendleContest.create(input)
+		logger.info(`>> successfully created contest`)
 		return contest._id;
 	} catch (e) {
 		logger.error(e)
@@ -32,6 +36,7 @@ const createRendleContest = async () => {
 
 const createRendleGameType = async (rendleGameType: RendleGameType) => {
 	try {
+		logger.info(`>> creating rendle ${rendleGameType.gameType}`)
 		if (!rendleGameType.isExpired) {
 			const contestId = await createRendleContest();
 			const input: RendleGameTypeInput = {
@@ -52,14 +57,17 @@ const createRendleGameType = async (rendleGameType: RendleGameType) => {
 			}
 			await RendleGameType.create(input)
 		}
+		logger.info(`>> created rendle ${rendleGameType.gameType}`)
 	} catch (e) {
 		logger.error(e)
 	}
 }
 
 const initializeRendleGames = async () => {
+	logger.info(">> checking for rendles collection")
 	const count = await (await RendleGameType.find()).length;
 	if (count <= 0) {
+		logger.info(">> creating rendles")
 		rendleGameTypes.map((rendleGameType) => {
 			createRendleGameType(rendleGameType);
 		})

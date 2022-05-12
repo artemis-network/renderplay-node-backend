@@ -16,7 +16,7 @@ const { User } = db_1.db;
 const checkForAccountActivation = (username, code) => __awaiter(void 0, void 0, void 0, function* () {
     const response = {
         error: false,
-        message: "Account Activated",
+        message: "account activated",
         isActivated: true
     };
     const error = {
@@ -36,7 +36,7 @@ const checkForAccountActivation = (username, code) => __awaiter(void 0, void 0, 
                             isActivated: true
                         }
                     }));
-                    user === null || user === void 0 ? void 0 : user.save();
+                    yield (user === null || user === void 0 ? void 0 : user.save());
                     return response;
                 }
             }
@@ -60,7 +60,7 @@ const verifyUserEmail = (username, token) => __awaiter(void 0, void 0, void 0, f
                         isVerified: true,
                     }
                 });
-                user === null || user === void 0 ? void 0 : user.save();
+                yield (user === null || user === void 0 ? void 0 : user.save());
                 return { message: "email verified", error: false };
             }
             return { message: "invalid token", error: true };

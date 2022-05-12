@@ -9,8 +9,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRendleParticipantsController = exports.saveRendleContestResultController = exports.enterRendlesContestController = exports.resetRendlesGameTypesController = exports.getRendleGameTypesController = void 0;
+exports.initializeRendleGamesController = exports.getRendleGameStatusController = exports.getRendleContestantsController = exports.getRendleParticipantsController = exports.saveRendleContestResultController = exports.enterRendlesContestController = exports.resetRendlesGameTypesController = exports.getRendleGameTypesController = void 0;
 const rendle_services_1 = require("../../services/rendle/rendle.services");
+const rendle_init_1 = require("../../bootstrap/rendle_init");
+const initializeRendleGamesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield (0, rendle_init_1.initializeRendleGames)();
+        return { message: "SUCCESSFULLY INITIALIZED" };
+    }
+    catch (e) {
+        return { message: "SOMETHING WENT WRONG" };
+    }
+});
+exports.initializeRendleGamesController = initializeRendleGamesController;
 const getRendleGameTypesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const rendles = yield (0, rendle_services_1.getRendleGameTypes)();
@@ -33,8 +44,8 @@ const resetRendlesGameTypesController = (req, res) => __awaiter(void 0, void 0, 
 exports.resetRendlesGameTypesController = resetRendlesGameTypesController;
 const enterRendlesContestController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { gameType, contestId, username, confirm } = req.body;
-        const response = yield (0, rendle_services_1.enterIntoRendleContest)(gameType, contestId, username, confirm);
+        const { gameType, contestId, userId, confirm } = req.body;
+        const response = yield (0, rendle_services_1.enterIntoRendleContest)(gameType, contestId, userId, confirm);
         return res.status(200).json(response);
     }
     catch (error) {
@@ -64,3 +75,25 @@ const getRendleParticipantsController = (req, res) => __awaiter(void 0, void 0, 
     }
 });
 exports.getRendleParticipantsController = getRendleParticipantsController;
+const getRendleContestantsController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { contestId } = req.body;
+        const response = yield (0, rendle_services_1.getRendleContestants)(contestId);
+        return res.status(200).json(response);
+    }
+    catch (error) {
+        return res.status(200).json({ message: error });
+    }
+});
+exports.getRendleContestantsController = getRendleContestantsController;
+const getRendleGameStatusController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId, contestId, gameType } = req.body;
+        const response = yield (0, rendle_services_1.getRendleGameStatus)(userId, contestId, gameType);
+        return res.status(200).json(response);
+    }
+    catch (error) {
+        return res.status(200).json({ message: error });
+    }
+});
+exports.getRendleGameStatusController = getRendleGameStatusController;

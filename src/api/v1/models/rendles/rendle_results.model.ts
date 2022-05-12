@@ -1,14 +1,13 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
-import { UserDocument } from './user.model'
 
 type RendleResultsDocument = Document & {
-	gameType: String;
-	contestId: String;
+	gameType: number;
+	contestId: string;
 	startedOn: Date,
 	completedOn: Date,
 	chances: number,
 	isWon: Boolean,
-	user: UserDocument
+	user: string;
 };
 
 type RendleResultsInput = {
@@ -46,7 +45,10 @@ const rendleResultsSchema = new Schema(
 			type: Schema.Types.Boolean,
 			required: true,
 		},
-		user: { type: Schema.Types.ObjectId, ref: 'User' }
+		userId: {
+			type: Schema.Types.ObjectId,
+			ref: 'User'
+		}
 	},
 );
 

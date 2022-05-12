@@ -1,15 +1,16 @@
 import express from 'express';
-
 const router = express.Router();
+
+const prefix = '/api/v1/rendles';
 
 import {
 	getRendleGameTypesController,
-	resetRendlesGameTypesController,
+	getRendleGameStatusController,
 	enterRendlesContestController,
-	saveRendleContestResultController,
-	getRendleParticipantsController,
 	getRendleContestantsController,
-	getRendleGameStatusController
+	getRendleParticipantsController,
+	resetRendlesGameTypesController,
+	saveRendleContestResultController,
 } from '../controllers/rendle/rendle_game.controller'
 
 import {
@@ -17,15 +18,18 @@ import {
 	updateCurrentGuessesController
 } from '../controllers/rendle/rendle_game_state.controller'
 
-router.get('/api/v1/rendles', getRendleGameTypesController);
-router.get('/api/v1/rendles/reset', resetRendlesGameTypesController);
-router.post('/api/v1/rendles/enter', enterRendlesContestController);
-router.post('/api/v1/rendles/save', saveRendleContestResultController);
-router.post('/api/v1/rendles/participants', getRendleParticipantsController);
-router.post('/api/v1/rendles/contestants', getRendleContestantsController);
-router.post('/api/v1/rendles/status', getRendleGameStatusController);
+router.get(`${prefix}/reset`, resetRendlesGameTypesController);
 
-router.post('/api/v1/rendles/words', getRendleCurrentGuessesController);
-router.post('/api/v1/rendles/words/update', updateCurrentGuessesController);
+router.get(prefix, getRendleGameTypesController);
+
+router.post(`${prefix}/enter`, enterRendlesContestController);
+router.post(`${prefix}/status`, getRendleGameStatusController);
+router.post(`${prefix}/save`, saveRendleContestResultController);
+
+router.post(`${prefix}/contestants`, getRendleContestantsController);
+router.post(`${prefix}/participants`, getRendleParticipantsController);
+
+router.post(`${prefix}/words`, getRendleCurrentGuessesController);
+router.post(`${prefix}/words/update`, updateCurrentGuessesController);
 
 export { router as rendleRoutes }
