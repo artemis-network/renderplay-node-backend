@@ -9,7 +9,7 @@ const ADMIN = {
 const EMAIL_CONFIG = {
 	username: process.env.EMAIL_VERIFICATION_EMAIL || "",
 	password: process.env.EMAIL_VERIFICATION_PASSWORD || "",
-	port: process.env.EMAIL_VERIFICATION_EMAIL_PORT || 0,
+	port: process.env.EMAIL_VERIFICATION_EMAIL_PORT || 25,
 	host: process.env.EMAIL_VERIFICATION_HOST || ""
 }
 
@@ -18,11 +18,19 @@ const GOOGLE_OAUTH_CLIENT = process.env.GOOGLE_OUTH_CLIENT_CREDENTIAL || ""
 const MONGO_DB_URL = process.env.MONGO_DB_URL || ""
 const PORT = process.env.PORT || 5000
 
+const AZURE_BLOB_CREDS = {
+	key: process.env.AZURE_BLOB_KEY || "",
+	account: process.env.AZURE_BLOB_ACCOUNT || "",
+	container: process.env.AZURE_BLOB_CONTAINER || "",
+	connectionString: process.env.AZURE_CONNECTION_STRING || ""
+}
+
 export {
 	PORT,
 	ADMIN,
 	JWT_SECRET,
 	MONGO_DB_URL,
 	EMAIL_CONFIG,
+	AZURE_BLOB_CREDS,
 	GOOGLE_OAUTH_CLIENT
 }
