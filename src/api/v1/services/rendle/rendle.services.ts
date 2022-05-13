@@ -2,6 +2,8 @@ import mongoose from 'mongoose'
 
 import { logger } from '../../utils/logger';
 import { db, RendleContestDocument } from '../../models/db'
+import { RendleGameState } from '../../models/rendles/rendle_game_state.model';
+import { RendleWord } from '../../models/rendles/rendle_word.model';
 const { RendleGameType, RendleContest, User, UserWallet, RendleResult, } = db;
 
 
@@ -160,6 +162,16 @@ const getRendleContestants = async (contestId: string) => {
 	}
 }
 
+const deleteWords = async (wordsList: any[]) => {
+	try {
+		for (let i = 0; i < wordsList.length; i++) {
+			await RendleWord.findByIdAndRemove(wordsList[i]._id)
+		}
+	} catch (e) {
+
+	}
+}
+
 const saveRendleContestResult = async (
 	gameType: number,
 	contestId: string,
@@ -172,8 +184,14 @@ const saveRendleContestResult = async (
 		const rendle = await RendleGameType.findOne({ contestId: contestId })
 		const contest = mongoose.Types.ObjectId(contestId);
 		const rendleContest = await RendleContest.findById(contest);
+		const gameState: any = await RendleGameState.findOne({ userId: user?._id })
+		await deleteWords(gameState?.words)
+		await gameState?.updateOne({
+			$set: { words: [] }
+		})
+		await gameState?.save()
 		await RendleResult.create({
-			user: user?._id,
+			userId: user?._id,
 			gameType: gameType,
 			chances: chances,
 			isWon: isWon,
@@ -203,20 +221,37 @@ const getRendleParticipants = async (contestId: string) => {
 	}
 }
 
+
 const getRendleGameStatus = async (userId: string, contestId: string, gameType: number) => {
 	try {
-		const contest = await RendleContest.findById(contestId)
-		const result = await RendleResult.findOne({ user: userId })
-		if (result === null) return { isFirstGame: false }
-		else return {
-			id: result?._id,
-			gameType: gameType,
-			startsOn: result?.startedOn,
-			completedOn: result?.completedOn,
-			isWon: result.isWon,
-			contestId: result.contestId,
-			isFirstGame: false
+		const result = await RendleResult.findOne({ userId: userId }).where({ contestId: contestId }).exec()
+		if (result !== null) {
+			if (result)
+				return {
+					id: result?._id,
+					gameType: gameType,
+					startsOn: result?.startedOn,
+					completedOn: result?.completedOn,
+					isWon: result.isWon,
+					contestId: result.contestId,
+					isFirstGame: false
+				}
 		}
+
+		const contest = await RendleContest.findById(contestId)
+		const contestants = contest?.contestants;
+		const isParticipating = contestants?.find((c) => c._id === userId)
+		if (isParticipating) {
+			return {
+				contestId: contest?._id,
+				isFirstGame: false
+			}
+		}
+
+		return {
+			isFirstGame: true
+		}
+
 	} catch (e) {
 		return { message: e }
 	}

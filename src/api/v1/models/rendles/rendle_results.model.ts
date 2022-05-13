@@ -7,7 +7,7 @@ type RendleResultsDocument = Document & {
 	completedOn: Date,
 	chances: number,
 	isWon: Boolean,
-	user: string;
+	userId: string;
 };
 
 type RendleResultsInput = {
@@ -17,6 +17,7 @@ type RendleResultsInput = {
 	completedOn: RendleResultsDocument['completedOn'],
 	chances: RendleResultsDocument['chances'],
 	isWon: RendleResultsDocument['isWon'],
+	userId: RendleResultsDocument['userId']
 };
 
 const rendleResultsSchema = new Schema(
