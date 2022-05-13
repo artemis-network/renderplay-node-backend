@@ -11,16 +11,16 @@ import { AZURE_BLOB_CREDS } from '../../../config'
 const multerAzure = require('multer-azure')
 
 const upload = multer({
-	storage: multerAzure({
-		key: AZURE_BLOB_CREDS.key,
-		account: AZURE_BLOB_CREDS.account,
-		container: AZURE_BLOB_CREDS.container,
-		connectionString: AZURE_BLOB_CREDS.connectionString,
-		createContainerIfNotExists: false,
-		blobPathResolver: function (req: any, file: any, callback: any) {
-			callback(null, new Date(Date.now()).getTime().toString() + file.originalname);
-		},
-	})
+	// storage: multerAzure({
+	// key: AZURE_BLOB_CREDS.key,
+	// account: AZURE_BLOB_CREDS.account,
+	// container: AZURE_BLOB_CREDS.container,
+	// connectionString: AZURE_BLOB_CREDS.connectionString,
+	// createContainerIfNotExists: false,
+	// blobPathResolver: function (req: any, file: any, callback: any) {
+	// 	callback(null, new Date(Date.now()).getTime().toString() + file.originalname);
+	// },
+	// })
 })
 
 const initializeRenderverseApp = async (req: Request, res: Response) => {
@@ -43,7 +43,8 @@ const initializeRenderverseApp = async (req: Request, res: Response) => {
 
 const router = express.Router();
 
-router.get("/", (req: Request, res: Response) => res.status(200).json({ message: "WELCOME TO RENDERVERSE BACKEND" }))
+router.get("/", (req: Request, res: Response) => res.status(200).json({ message: "WELCOME TO RENDERVERSE" }))
+router.get("/api/v1/ping", (req: Request, res: Response) => res.status(200).json({ message: "WELCOME TO RENDERVERSE BACKEND" }))
 router.post('/api/v1/renderverse/init', upload.single('image'), initializeRenderverseApp);
 
 export { router as pingRoutes }
