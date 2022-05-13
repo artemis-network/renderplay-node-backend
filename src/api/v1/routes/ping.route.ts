@@ -25,18 +25,16 @@ const upload = multer({
 
 const initializeRenderverseApp = async (req: Request, res: Response) => {
 	try {
-		// const filename = new Date(Date.now()).getTime().toString() + file.originalname;
-		// console.log(file)
-		// // console.log(filename)
-		// await initUser()
-		// await initializeRendleGames()
-		// const { word } = req.body;
-		// const image = `/${req.file?.destination}/${req.file?.filename}` || '';
-		// const refWord = {
-		// 	word,
-		// 	image
-		// }
-		// const response = await initializeRenderScanGames(refWord);
+		// console.log(filename)
+		await initUser()
+		await initializeRendleGames()
+		const { word } = req.body;
+		const image = `/${req.file?.destination}/${req.file?.filename}` || '';
+		const refWord = {
+			word,
+			image
+		}
+		const response = await initializeRenderScanGames(refWord);
 		res.status(200).json({ message: "OK" })
 	} catch (e) {
 		res.status(200).json(e)
