@@ -92,7 +92,7 @@ const createUser = async (username: string, email: string, password: string) => 
 		createWalletForUser(newUser._id)
 		const result: Result = {
 			message: "Success",
-			errorType: "NONE",
+			errorType: "SUCCESS",
 			error: false,
 			status: 200
 		};
