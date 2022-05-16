@@ -175,33 +175,31 @@ const deleteWords = async (wordsList: any[]) => {
 const saveRendleContestResult = async (
 	gameType: number,
 	contestId: string,
-	username: string,
+	userId: string,
 	chances: number,
 	isWon: boolean
 ) => {
 	try {
-		const user = await User.findOne({ username: username })
 		const rendle = await RendleGameType.findOne({ contestId: contestId })
 		const contest = mongoose.Types.ObjectId(contestId);
 		const rendleContest = await RendleContest.findById(contest);
-		const gameState: any = await RendleGameState.findOne({ userId: user?._id })
-		await deleteWords(gameState?.words)
-		await gameState?.updateOne({
-			$set: { words: [] }
-		})
-		await gameState?.save()
+		const gameState: any = await RendleGameState.findOne({ userId: userId })
+		const words = gameState?.words
 		await RendleResult.create({
-			userId: user?._id,
+			userId: userId,
 			gameType: gameType,
 			chances: chances,
 			isWon: isWon,
 			completedOn: Date.now(),
 			startedOn: rendle?.startsOn,
-			contestId: rendleContest?._id
+			contestId: rendleContest?._id,
+			rendleWords: words
 		})
-		// await RendleGameState.findOneAndRemove({ user: user?._id })
+		await deleteWords(words)
+		await RendleGameState.findOneAndRemove({ userId: userId })
 		return { message: "Successfully Posted" }
 	} catch (error) {
+		console.log(error)
 		logger.error(">> " + error)
 		return { message: "Something went wrong" }
 	}

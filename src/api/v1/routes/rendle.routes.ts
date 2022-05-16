@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 
-const prefix = '/api/v1/rendles';
+const prefix = '/backend/v1/rendles';
 
 import {
 	getRendleGameTypesController,

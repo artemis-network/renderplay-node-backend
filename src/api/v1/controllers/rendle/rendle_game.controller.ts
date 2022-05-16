@@ -40,8 +40,9 @@ const enterRendlesContestController = async (req: Request, res: Response) => {
 
 const saveRendleContestResultController = async (req: Request, res: Response) => {
 	try {
-		const { gameType, contestId, username, chances, isWon } = req.body;
-		const response = await saveRendleContestResult(gameType, contestId, username, chances, isWon)
+		const { gameType, contestId, userId, chances, isWon } = req.body;
+		console.log(req.body)
+		const response = await saveRendleContestResult(gameType, contestId, userId, chances, isWon)
 		return res.status(200).json(response)
 	} catch (error) {
 		return res.status(200).json({ message: error })

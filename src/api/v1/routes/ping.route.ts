@@ -43,7 +43,7 @@ const initializeRenderverseApp = async (req: Request, res: Response) => {
 
 const router = express.Router();
 
-router.get("/api/v1/ping", (req: Request, res: Response) => res.status(200).json({ message: "WELCOME TO RENDERVERSE BACKEND" }))
-router.post('/api/v1/renderverse/init', upload.single('image'), initializeRenderverseApp);
+router.get("/backend/v1/ping", (req: Request, res: Response) => res.status(200).json({ message: "WELCOME TO RENDERVERSE BACKEND" }))
+router.post('/backend/v1/renderverse/init', upload.single('image'), initializeRenderverseApp);
 
 export { router as pingRoutes }

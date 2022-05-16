@@ -13,15 +13,15 @@ import { createUserController, createGoogleUserController, loginUserController }
 
 import { depositFundsController } from '../controllers/user/wallet.controller'
 
-router.post('/api/v1/users/login', loginUserController);
-router.post('/api/v1/users/register', createUserController);
-router.post('/api/v1/users/google-login', createGoogleUserController);
-router.get('/api/v1/users/test-token', authorizeUserMiddleWare, (req, res) => res.send("hello"));
+router.post('/backend/v1/users/login', loginUserController);
+router.post('/backend/v1/users/register', createUserController);
+router.post('/backend/v1/users/google-login', createGoogleUserController);
+router.get('/backend/v1/users/test-token', authorizeUserMiddleWare, (req, res) => res.send("hello"));
 
-router.post("/api/v1/users/activate-user", checkForAccountActivationController)
-router.post("/api/v1/users/verify-user", verifyUserEmailController)
+router.post("/backend/v1/users/activate-user", checkForAccountActivationController)
+router.post("/backend/v1/users/verify-user", verifyUserEmailController)
 
-router.post("/api/v1/wallets", getWalletController)
-router.post("/api/v1/wallets/deposit", depositFundsController)
+router.post("/backend/v1/wallets", getWalletController)
+router.post("/backend/v1/wallets/deposit", depositFundsController)
 
 export { router as userRoutes }

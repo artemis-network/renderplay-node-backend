@@ -49,7 +49,13 @@ const rendleResultsSchema = new Schema(
 		userId: {
 			type: Schema.Types.ObjectId,
 			ref: 'User'
-		}
+		},
+		rendleWords: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: 'RendleWord'
+			}
+		]
 	},
 );
 

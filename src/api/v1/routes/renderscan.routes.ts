@@ -23,9 +23,9 @@ const fileStorageEngine = multer.diskStorage({
 const upload = multer({ storage: fileStorageEngine })
 
 
-router.post('/api/v1/renderscan/enter', enterIntoRenderScanContestController);
-router.post('/api/v1/renderscan/save', upload.single("image"), saveRenderScanContestResultController);
-router.post('/api/v1/renderscan/contestants', getRenderScanContestantsController);
-router.post('/api/v1/renderscan/participants', getRenderScanParticipantsController);
+router.post('/backend/v1/renderscan/enter', enterIntoRenderScanContestController);
+router.post('/backend/v1/renderscan/save', upload.single("image"), saveRenderScanContestResultController);
+router.post('/backend/v1/renderscan/contestants', getRenderScanContestantsController);
+router.post('/backend/v1/renderscan/participants', getRenderScanParticipantsController);
 
 export { router as renderScanRoutes }
