@@ -1,4 +1,3 @@
-npm run build
 docker stop renderverse-backend-server
 docker rm renderverse-backend-server
 docker rmi renderverse/backend-server
