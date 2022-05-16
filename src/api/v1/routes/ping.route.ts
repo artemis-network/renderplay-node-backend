@@ -10,6 +10,8 @@ import { AZURE_BLOB_CREDS } from '../../../config'
 
 const multerAzure = require('multer-azure')
 
+import { parentPrefix, renderversePrefix, } from '../config'
+
 const upload = multer({
 	// storage: multerAzure({
 	// key: AZURE_BLOB_CREDS.key,
@@ -43,7 +45,7 @@ const initializeRenderverseApp = async (req: Request, res: Response) => {
 
 const router = express.Router();
 
-router.get("/backend/v1/ping", (req: Request, res: Response) => res.status(200).json({ message: "WELCOME TO RENDERVERSE BACKEND" }))
-router.post('/backend/v1/renderverse/init', upload.single('image'), initializeRenderverseApp);
+router.get(`${parentPrefix}/ping`, (req: Request, res: Response) => res.status(200).json({ message: "WELCOME TO RENDERVERSE BACKEND" }))
+router.post(`${renderversePrefix}/init`, upload.single('image'), initializeRenderverseApp);
 
 export { router as pingRoutes }

@@ -1,7 +1,4 @@
 import express from 'express';
-const router = express.Router();
-
-const prefix = '/backend/v1/rendles';
 
 import {
 	getRendleGameTypesController,
@@ -18,18 +15,22 @@ import {
 	updateCurrentGuessesController
 } from '../controllers/rendle/rendle_game_state.controller'
 
-router.get(`${prefix}/reset`, resetRendlesGameTypesController);
+import { rendlesPrefix } from '../config'
 
-router.get(prefix, getRendleGameTypesController);
+const router = express.Router();
 
-router.post(`${prefix}/enter`, enterRendlesContestController);
-router.post(`${prefix}/status`, getRendleGameStatusController);
-router.post(`${prefix}/save`, saveRendleContestResultController);
+router.get(`${rendlesPrefix}/reset`, resetRendlesGameTypesController);
 
-router.post(`${prefix}/contestants`, getRendleContestantsController);
-router.post(`${prefix}/participants`, getRendleParticipantsController);
+router.get(rendlesPrefix, getRendleGameTypesController);
 
-router.post(`${prefix}/words`, getRendleCurrentGuessesController);
-router.post(`${prefix}/words/update`, updateCurrentGuessesController);
+router.post(`${rendlesPrefix}/enter`, enterRendlesContestController);
+router.post(`${rendlesPrefix}/status`, getRendleGameStatusController);
+router.post(`${rendlesPrefix}/save`, saveRendleContestResultController);
+
+router.post(`${rendlesPrefix}/contestants`, getRendleContestantsController);
+router.post(`${rendlesPrefix}/participants`, getRendleParticipantsController);
+
+router.post(`${rendlesPrefix}/words`, getRendleCurrentGuessesController);
+router.post(`${rendlesPrefix}/words/update`, updateCurrentGuessesController);
 
 export { router as rendleRoutes }

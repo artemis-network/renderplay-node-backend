@@ -1,6 +1,7 @@
-docker stop renderverse-server
-docker rm renderverse-server
-docker rmi renderverse/renderscan
-docker build -t renderverse/renderscan .
-docker run -p 5000:5000 --name renderverse-server -d --env-file .env renderverse/renderscan
+npm run build
+docker stop renderverse-backend-server
+docker rm renderverse-backend-server
+docker rmi renderverse/backend-server
+docker build --no-cache -t renderverse/backend-server .
+docker run -p 5000:5000 --restart=always --name renderverse-backend-server -d --env-file .env renderverse/backend-server
 docker ps -a

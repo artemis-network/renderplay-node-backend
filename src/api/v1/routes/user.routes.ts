@@ -13,15 +13,17 @@ import { createUserController, createGoogleUserController, loginUserController }
 
 import { depositFundsController } from '../controllers/user/wallet.controller'
 
-router.post('/backend/v1/users/login', loginUserController);
-router.post('/backend/v1/users/register', createUserController);
-router.post('/backend/v1/users/google-login', createGoogleUserController);
-router.get('/backend/v1/users/test-token', authorizeUserMiddleWare, (req, res) => res.send("hello"));
+import { userPrefix, walletPrefix } from '../config'
 
-router.post("/backend/v1/users/activate-user", checkForAccountActivationController)
-router.post("/backend/v1/users/verify-user", verifyUserEmailController)
+router.post(`${userPrefix}/login`, loginUserController);
+router.post(`${userPrefix}/register`, createUserController);
+router.post(`${userPrefix}/google-login`, createGoogleUserController);
+router.get(`${userPrefix}/test-token`, authorizeUserMiddleWare, (req, res) => res.send("hello"));
 
-router.post("/backend/v1/wallets", getWalletController)
-router.post("/backend/v1/wallets/deposit", depositFundsController)
+router.post(`${userPrefix}/users/activate-user`, checkForAccountActivationController)
+router.post(`${userPrefix}/users/verify-user`, verifyUserEmailController)
+
+router.post(`${walletPrefix}/wallets`, getWalletController)
+router.post(`${walletPrefix}/wallets/deposit`, depositFundsController)
 
 export { router as userRoutes }
