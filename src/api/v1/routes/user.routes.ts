@@ -23,7 +23,7 @@ router.get(`${userPrefix}/test-token`, authorizeUserMiddleWare, (req, res) => re
 router.post(`${userPrefix}/users/activate-user`, checkForAccountActivationController)
 router.post(`${userPrefix}/users/verify-user`, verifyUserEmailController)
 
-router.post(`${walletPrefix}/wallets`, getWalletController)
-router.post(`${walletPrefix}/wallets/deposit`, depositFundsController)
+router.post(`${walletPrefix}`, getWalletController)
+router.post(`${walletPrefix}/deposit`, depositFundsController)
 
 export { router as userRoutes }
