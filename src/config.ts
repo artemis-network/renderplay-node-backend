@@ -25,6 +25,8 @@ const AZURE_BLOB_CREDS = {
 	connectionString: process.env.AZURE_CONNECTION_STRING || ""
 }
 
+const API_ADMIN_PASSWORD = process.env.API_ADMIN_PASSWORD || ""
+
 export {
 	PORT,
 	ADMIN,
@@ -32,5 +34,6 @@ export {
 	MONGO_DB_URL,
 	EMAIL_CONFIG,
 	AZURE_BLOB_CREDS,
+	API_ADMIN_PASSWORD,
 	GOOGLE_OAUTH_CLIENT
 }

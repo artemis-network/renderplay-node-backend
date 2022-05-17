@@ -179,6 +179,7 @@ const googleLogin = async (googleToken: string) => {
 	try {
 		const { payload } = await client.verifyIdToken({ idToken: googleToken, audience: GOOGLE_OAUTH_CLIENT })
 		const { email, email_verified } = payload
+		console.log(payload)
 		const username = email.split("@")[0]
 		if (email_verified) {
 			logger.info(">> creating user " + username + " >> ");
@@ -214,6 +215,7 @@ const googleLogin = async (googleToken: string) => {
 				};
 				return result;
 			} catch (err: any) {
+				console.log(err)
 				if (err["code"] === 11000) {
 					const user = await User.findOne({ email: email })
 					logger.info(">> generating token " + username + " >> ");
@@ -235,6 +237,70 @@ const googleLogin = async (googleToken: string) => {
 			}
 		}
 	} catch (err: any) {
+		console.log(err)
+		logger.error(err);
+	}
+
+}
+
+const googleMobileLogin = async (email: string) => {
+	try {
+		const username = email.split("@")[0]
+		logger.info(">> creating user " + username + " >> ");
+		logger.info(">> creating token for " + username + " >> ");
+		const userInput: UserInput = {
+			username: username,
+			email: email,
+			password: "",
+			isActivated: false,
+			isGoogleAccount: true,
+			isVerified: false,
+			token: ""
+		};
+		try {
+			const newUser = await User.create(userInput)
+			logger.info(">> user created " + username + " >> ");
+			createWalletForUser(newUser._id)
+			logger.info(">> authentication successfully " + username + " >> ");
+			logger.info(">> generating token " + username + " >> ");
+			const token: string = generateJWTToken("username");
+			logger.info(">> sending resposne " + username + " >> ");
+
+			const result: Result = {
+				error: false,
+				userId: newUser._id,
+				message: "SUCCESS",
+				username: newUser.username,
+				errorType: "NONE",
+				email: newUser.email,
+				accessToken: token,
+				publicToken: "[ADMIN]",
+				status: 200
+			};
+			return result;
+		} catch (err: any) {
+			console.log(err)
+			if (err["code"] === 11000) {
+				const user = await User.findOne({ email: email })
+				logger.info(">> generating token " + username + " >> ");
+				const token: string = generateJWTToken(username);
+				logger.info(">> sending resposne " + username + " >> ");
+				const response: Result = {
+					error: false,
+					userId: user?._id,
+					message: "SUCCESS",
+					username: username,
+					email: email,
+					accessToken: token,
+					publicToken: "[ADMIN]",
+					status: 200,
+					errorType: "NONE"
+				}
+				return response;
+			}
+		}
+	} catch (err: any) {
+		console.log(err)
 		logger.error(err);
 	}
 
@@ -242,4 +308,5 @@ const googleLogin = async (googleToken: string) => {
 
 
 
-export { createUser, loginUser, googleLogin }
+
+export { createUser, loginUser, googleLogin, googleMobileLogin }

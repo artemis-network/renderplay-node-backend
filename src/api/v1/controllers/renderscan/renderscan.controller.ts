@@ -1,17 +1,19 @@
 import { Request, Response } from 'express';
 
 import {
-	enterIntoRenderScanContest,
+	getRenderScanTypes,
+	getRenderScanGameStatus,
 	getRenderScanContestants,
 	getRenderScanParticipants,
-	saveRenderScanContestResult
+	enterIntoRenderScanContest,
+	saveRenderScanContestResult,
 } from '../../services/renderscan/renderscan.services'
 
 
 const enterIntoRenderScanContestController = async (req: Request, res: Response) => {
 	try {
-		const { gameType, contestId, username, confirm } = req.body;
-		const response = await enterIntoRenderScanContest(gameType, contestId, username, confirm);
+		const { contestId, userId, confirm } = req.body;
+		const response = await enterIntoRenderScanContest(contestId, userId, confirm);
 		return res.status(200).json(response);
 	} catch (e) {
 		return res.status(200).json(e)
@@ -20,9 +22,8 @@ const enterIntoRenderScanContestController = async (req: Request, res: Response)
 
 const saveRenderScanContestResultController = async (req: Request, res: Response) => {
 	try {
-		const { contestId, username } = req.body;
-		const fileurl = req.file?.destination + "/" + req.file?.filename || '';
-		const response = await saveRenderScanContestResult(contestId, username, fileurl);
+		const { contestId, userId, fileUrl } = req.body;
+		const response = await saveRenderScanContestResult(contestId, userId, fileUrl);
 		return res.status(200).json(response);
 	} catch (e) {
 		return res.status(200).json(e)
@@ -49,9 +50,33 @@ const getRenderScanParticipantsController = async (req: Request, res: Response) 
 	}
 }
 
+const getRenderScanGameStatusController = async (req: Request, res: Response) => {
+	try {
+		const { userId, contestId } = req.body
+		const response = await getRenderScanGameStatus(userId, contestId);
+		return res.status(200).json(response)
+	} catch (error) {
+		return res.status(200).json({ message: error })
+	}
+}
+
+
+const getRenderScanTypesController = async (req: Request, res: Response) => {
+	try {
+		const response = await getRenderScanTypes();
+		return res.status(200).json(response)
+	} catch (error) {
+		console.log(error)
+		return res.status(200).json({ message: error })
+	}
+
+}
+
 export {
-	saveRenderScanContestResultController,
-	enterIntoRenderScanContestController,
+	getRenderScanTypesController,
+	getRenderScanGameStatusController,
 	getRenderScanContestantsController,
-	getRenderScanParticipantsController
+	getRenderScanParticipantsController,
+	enterIntoRenderScanContestController,
+	saveRenderScanContestResultController,
 }

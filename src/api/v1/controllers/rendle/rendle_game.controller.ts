@@ -21,8 +21,11 @@ const getRendleGameTypesController = async (req: Request, res: Response) => {
 
 const resetRendlesGameTypesController = async (req: Request, res: Response) => {
 	try {
-		const response = await resetRendlesGameTypes()
-		return res.status(200).json(response)
+		if (req.body.password === "password@1234") {
+			const response = await resetRendlesGameTypes()
+			return res.status(200).json(response)
+		}
+		return res.status(200).json({ message: "Invalid Password" })
 	} catch (error) {
 		return res.status(200).json({ message: "Not OK" })
 	}
@@ -41,7 +44,6 @@ const enterRendlesContestController = async (req: Request, res: Response) => {
 const saveRendleContestResultController = async (req: Request, res: Response) => {
 	try {
 		const { gameType, contestId, userId, chances, isWon } = req.body;
-		console.log(req.body)
 		const response = await saveRendleContestResult(gameType, contestId, userId, chances, isWon)
 		return res.status(200).json(response)
 	} catch (error) {

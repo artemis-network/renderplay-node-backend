@@ -19,7 +19,7 @@ import { rendlesPrefix } from '../config'
 
 const router = express.Router();
 
-router.get(`${rendlesPrefix}/reset`, resetRendlesGameTypesController);
+router.post(`${rendlesPrefix}/reset`, resetRendlesGameTypesController);
 
 router.get(rendlesPrefix, getRendleGameTypesController);
 

@@ -1,12 +1,9 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
-import { RenderScanDocument } from './renderscan.model'
-import { RenderScanContestDocument } from './renderscan_contests.model'
-import { UserDocument } from '../user.model';
 
 type RenderScanResultsDocument = Document & {
-	contestId: RenderScanContestDocument;
-	userId: UserDocument,
-	scanId: RenderScanDocument,
+	contestId: string;
+	userId: string,
+	scanId: string,
 };
 
 const renderScanResultsSchema = new Schema(

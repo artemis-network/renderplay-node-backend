@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createUser, loginUser, googleLogin } from '../../services/user/user.service'
+import { createUser, loginUser, googleLogin, googleMobileLogin } from '../../services/user/user.service'
 
 const createUserController = async (req: Request, res: Response) => {
 	try {
@@ -21,6 +21,20 @@ const createGoogleUserController = async (req: Request, res: Response) => {
 	}
 }
 
+const createMobileGoogleUserController = async (req: Request, res: Response) => {
+	try {
+		const { email, client } = req.body;
+		console.log(req.body)
+		if (client === "client0123") {
+			const result = await googleMobileLogin(email)
+			return res.status(200).json(result)
+		}
+		return res.status(200).json({ message: "invalid client id" })
+	} catch (e) {
+		return res.status(200).json(e);
+	}
+}
+
 const loginUserController = async (req: Request, res: Response) => {
 	try {
 		const { username, password } = req.body;
@@ -31,4 +45,4 @@ const loginUserController = async (req: Request, res: Response) => {
 	}
 };
 
-export { createUserController, createGoogleUserController, loginUserController };
+export { createUserController, createGoogleUserController, loginUserController, createMobileGoogleUserController };

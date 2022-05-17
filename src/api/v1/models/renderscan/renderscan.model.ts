@@ -2,17 +2,12 @@ import mongoose, { Schema, Model, Document } from 'mongoose';
 import { UserDocument } from '../user.model'
 
 type RenderScanDocument = Document & {
-	scan: any;
-	fileName: string;
+	fileUrl: string;
 	user: UserDocument
 };
 
 const renderScanSchema = new Schema(
 	{
-		scan: {
-			type: Schema.Types.String,
-			required: true,
-		},
 		fileUrl: {
 			type: Schema.Types.String,
 			required: true,
