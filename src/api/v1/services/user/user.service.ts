@@ -57,7 +57,7 @@ interface Result {
 const createWalletForUser = (user_id: string) => {
 	logger.info(">> creating wallet for" + user_id + " >> ");
 	const userWalletInput: UserWalletInput = {
-		balance: 0,
+		balance: 5000,
 		isActive: true,
 		user: user_id
 	};
