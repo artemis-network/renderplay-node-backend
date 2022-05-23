@@ -40,7 +40,36 @@ const depositFunds = async (userId: string, amount: number) => {
 	}
 }
 
+
+const getBalance = async (userId: string) => {
+	try {
+		const wallet = await UserWallet.findOne({ user: userId });
+		return wallet?.balance || 0;
+	} catch (e) {
+		console.log(e)
+	}
+}
+
+const deductFunds = async (userId: string, amount: number) => {
+	try {
+		const wallet: any = await UserWallet.findOne({ user: userId });
+		const currentBalance = await wallet?.balance || 0;
+		await wallet?.updateOne({
+			$set: { balance: currentBalance - amount }
+		})
+		await wallet?.save()
+		return { message: "funds deducted", balance: wallet?.balance }
+	}
+	catch (e) {
+		console.log(e)
+	}
+}
+
+
+
 export {
 	getWallet,
-	depositFunds
+	depositFunds,
+	getBalance,
+	deductFunds
 }

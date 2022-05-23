@@ -1,14 +1,15 @@
 import { Request, Response } from 'express';
 import {
 	getRendleGameTypes,
-	resetRendlesGameTypes,
-	enterIntoRendleContest,
 	saveRendleContestResult,
 	getRendleParticipants,
 	getRendleContestants,
-	getRendleGameStatus
 } from '../../services/rendle/rendle.services'
 
+import { deductFunds, getBalance } from '../../services/user/wallet.service'
+import { createGameStateForUser, getGameStateIdByUserId } from '../../services/rendle/rendle_game_state.services';
+import { doesUserAlreadyInContest, getEntryFee, addContestantToContest } from '../../services/rendle/rendle.services';
+import { doesUserFinishedGame, doesUserPlayingContest } from '../../services/rendle/rendle.services';
 
 const getRendleGameTypesController = async (req: Request, res: Response) => {
 	try {
@@ -19,25 +20,68 @@ const getRendleGameTypesController = async (req: Request, res: Response) => {
 	}
 }
 
-const resetRendlesGameTypesController = async (req: Request, res: Response) => {
-	try {
-		if (req.body.password === "password@1234") {
-			const response = await resetRendlesGameTypes()
-			return res.status(200).json(response)
-		}
-		return res.status(200).json({ message: "Invalid Password" })
-	} catch (error) {
-		return res.status(200).json({ message: "Not OK" })
-	}
+enum ContestState {
+	INSUFFICENT_FUNDS = "[INSUFFICENT_FUNDS]",
+	APPROVED = "[APPROVED]",
+	ALREADY_IN_CONTEST = "[ALREADY_IN_CONTEST]",
 }
 
 const enterRendlesContestController = async (req: Request, res: Response) => {
 	try {
-		const { gameType, contestId, userId, confirm } = req.body
-		const response = await enterIntoRendleContest(gameType, contestId, userId, confirm);
-		return res.status(200).json(response)
+		const { gameType, contestId, userId, request } = req.body
+
+		// checking is user already in contest
+		const isInContest = await doesUserAlreadyInContest(userId, contestId);
+		if (isInContest) {
+			const gameStateId = await getGameStateIdByUserId(userId)
+			return res.status(200).json({ message: "ok", status: ContestState.ALREADY_IN_CONTEST, gameStateId: gameStateId?._id })
+		}
+
+		// checking user has sufficient balance  
+		const entryFee: any = await getEntryFee(gameType);
+		const balance: any = await getBalance(userId);
+		if (entryFee > balance) return res.status(200).json({ message: "insufficent funds", status: ContestState.INSUFFICENT_FUNDS })
+
+		if (request)
+			return res.status(200).json({ message: "approved", status: ContestState.APPROVED, approved: true })
+
+		// deducting entry fee from user wallet
+		await deductFunds(userId, entryFee)
+		// enter user in the contest 
+		await addContestantToContest(userId, contestId, entryFee);
+		// create game state for user
+		const gameState = await createGameStateForUser(userId, contestId)
+		return res.status(200).json({ message: "ok", error: false, gameStateId: gameState.gameStateId });
 	} catch (error) {
-		return res.status(200).json({ message: "Not OK" })
+		return res.status(200).json({ message: "not okay" })
+	}
+}
+
+const getRendleGameStatusController = async (req: Request, res: Response) => {
+	try {
+		const { userId, contestId } = req.body
+
+		// user already finished game 
+		const gameResult = await doesUserFinishedGame(userId, contestId)
+
+		// sending game result as response 
+		if (gameResult) return res.status(200).json(gameResult)
+
+		// check user still playing contest
+		const isPlaying = await doesUserPlayingContest(userId, contestId);
+		if (isPlaying) {
+			// fetching current game state and sending response
+			const gameState = await getGameStateIdByUserId(userId);
+			const response = {
+				contestId: contestId,
+				isGameCompleted: false,
+				words: gameState?.words,
+				startedOn: gameState?.startedOn
+			}
+			return res.status(200).json(response)
+		}
+	} catch (error) {
+		return res.status(200).json({ message: error })
 	}
 }
 
@@ -71,19 +115,10 @@ const getRendleContestantsController = async (req: Request, res: Response) => {
 	}
 }
 
-const getRendleGameStatusController = async (req: Request, res: Response) => {
-	try {
-		const { userId, contestId, gameType } = req.body
-		const response = await getRendleGameStatus(userId, contestId, gameType);
-		return res.status(200).json(response)
-	} catch (error) {
-		return res.status(200).json({ message: error })
-	}
-}
+
 
 export {
 	getRendleGameTypesController,
-	resetRendlesGameTypesController,
 	enterRendlesContestController,
 	saveRendleContestResultController,
 	getRendleParticipantsController,

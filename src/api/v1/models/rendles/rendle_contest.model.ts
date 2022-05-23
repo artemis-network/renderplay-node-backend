@@ -4,7 +4,7 @@ import { UserDocument } from '../user.model'
 type RendleContestDocument = Document & {
 	minimumContestants: number;
 	prizePool: number;
-	contestants: Array<UserDocument>
+	contestants: string[]
 };
 
 const rendleContestSchema = new Schema(
@@ -18,7 +18,7 @@ const rendleContestSchema = new Schema(
 			required: true,
 			default: 0
 		},
-		contestants: [{ type: Schema.Types.ObjectId, ref: 'RendleContestant' }]
+		contestants: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 	},
 );
 

@@ -6,9 +6,12 @@ import {
 	enterRendlesContestController,
 	getRendleContestantsController,
 	getRendleParticipantsController,
-	resetRendlesGameTypesController,
 	saveRendleContestResultController,
 } from '../controllers/rendle/rendle_game.controller'
+
+import {
+	resetRendlesGameTypesController
+} from '../controllers/rendle/rendle_init.controller'
 
 import {
 	getRendleCurrentGuessesController,

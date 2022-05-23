@@ -7,6 +7,7 @@ import {
 	getRenderScanParticipants,
 	enterIntoRenderScanContest,
 	saveRenderScanContestResult,
+	resetRenderScanGames
 } from '../../services/renderscan/renderscan.services'
 
 
@@ -69,8 +70,21 @@ const getRenderScanTypesController = async (req: Request, res: Response) => {
 		console.log(error)
 		return res.status(200).json({ message: error })
 	}
+}
+
+const resetRenderScanGamesController = async (req: Request, res: Response) => {
+	try {
+		const { word, image, type } = req.body
+		const response = await resetRenderScanGames(word, image, type);
+		return res.status(200).json(response)
+	} catch (error) {
+		console.log(error)
+		return res.status(200).json({ message: error })
+	}
 
 }
+
+
 
 export {
 	getRenderScanTypesController,
@@ -79,4 +93,5 @@ export {
 	getRenderScanParticipantsController,
 	enterIntoRenderScanContestController,
 	saveRenderScanContestResultController,
+	resetRenderScanGamesController
 }

@@ -10,6 +10,7 @@ import {
 	getRenderScanGameStatusController,
 	enterIntoRenderScanContestController,
 	saveRenderScanContestResultController,
+	resetRenderScanGamesController
 } from '../controllers/renderscan/renderscan.controller'
 
 
@@ -29,6 +30,7 @@ const upload = multer({ storage: fileStorageEngine })
 
 
 router.get(`${renderscanPrefix}`, getRenderScanTypesController);
+router.post(`${renderscanPrefix}/reset`, resetRenderScanGamesController);
 router.post(`${renderscanPrefix}/enter`, enterIntoRenderScanContestController);
 router.post(`${renderscanPrefix}/save`, upload.single("image"), saveRenderScanContestResultController);
 router.post(`${renderscanPrefix}/status`, getRenderScanGameStatusController);

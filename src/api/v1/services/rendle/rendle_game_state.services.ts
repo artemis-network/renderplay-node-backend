@@ -1,43 +1,42 @@
-import { db, RendleGameStateDocument, RendleWordDocument } from '../../models/db'
+import { db } from '../../models/db'
 const { RendleGameState, RendleWord } = db;
 
-type RendleGameStateInput = {
-	userId: RendleGameStateDocument['userId'];
-	contestId: RendleGameStateDocument['contestId']
-	words: RendleGameStateDocument['words']
-};
-
-const updateCurrentGuesses = async (userId: string, contestId: string, word: string, gameStateId: string) => {
+const createGameStateForUser = async (userId: string, contestId: string) => {
 	try {
-		const rendleWord = await RendleWord.create({ guess: word })
-		const gameState = await RendleGameState.findOne({ userId: userId })
-		if (gameState !== null) {
-			await gameState?.updateOne({
-				$set: {
-					words: [...gameState.words, rendleWord]
-				}
-			})
-			await gameState?.save()
-			return { message: "Successfully updated guess", gameStateId: gameState?._id }
-		} else {
-			const wordList = [];
-			wordList.push(rendleWord)
-			const input: RendleGameStateInput = {
-				contestId: contestId,
-				userId: userId,
-				words: wordList
-			}
-			const { _id } = await RendleGameState.create(input)
-			return { message: "Successfully created new guess", gameStateId: _id }
-		}
+		const gameState = await RendleGameState.create({
+			userId: userId,
+			contestId: contestId,
+			words: [],
+			startedOn: new Date(Date.now())
+		});
+		return { gameStateId: gameState?._id }
 	} catch (error) {
-		console.log(error)
-		return { message: `Something went wrong ${error}` }
+		return { gameStateId: null }
 	}
 }
 
+const getGameStateIdByUserId = async (userId: string) => {
+	return await RendleGameState.findOne({ userId: userId })
+}
 
-const getRendleCurrentGuesses = async (userId: string) => {
+const updateGuessessListInGameStateByUserId = async (userId: string, word: string) => {
+	try {
+		const rendleWord = await RendleWord.create({ guess: word })
+		const gameState = await RendleGameState.findOne({ userId: userId })
+		await gameState?.updateOne({
+			$set: {
+				words: [...gameState.words, rendleWord]
+			}
+		})
+		await gameState?.save()
+		return { gameStateId: gameState?._id }
+	} catch (error) {
+		return { message: `Something went wrong ${error}` }
+	}
+
+}
+
+const getRendleGameStateGuessessListByUserId = async (userId: string) => {
 	try {
 		const gameState: any = await RendleGameState.findOne({ userId: userId }).populate('words').exec()
 		const words = await gameState?.words;
@@ -45,13 +44,15 @@ const getRendleCurrentGuesses = async (userId: string) => {
 		for (let i = 0; i < words.length; i++) {
 			guesses.push(await words[i].guess)
 		}
-		return { guesses: guesses }
+		return { guesses: guesses, startedOn: gameState?.startedOn }
 	} catch (error) {
 		return { message: `Something went wrong ${error}` }
 	}
 }
 
 export {
-	updateCurrentGuesses,
-	getRendleCurrentGuesses
+	getGameStateIdByUserId,
+	createGameStateForUser,
+	updateGuessessListInGameStateByUserId,
+	getRendleGameStateGuessessListByUserId
 }

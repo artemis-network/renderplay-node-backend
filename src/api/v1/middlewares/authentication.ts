@@ -8,6 +8,7 @@ const { User } = db
 const authorizeUserMiddleWare = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		logger.info(">> getting authorization header >>");
+		logger.info(">> someting went wrong");
 		const token = req.headers['authorization']?.toString();
 		logger.info(">> decoding token " + token + " >> ");
 		const decoded = decodeJWTToken(token || "");

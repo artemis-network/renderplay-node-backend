@@ -1,27 +1,17 @@
 import mongoose from 'mongoose'
 
+import { db } from '../../models/db'
 import { logger } from '../../utils/logger';
-import { db, RendleContestDocument } from '../../models/db'
-import { RendleGameState } from '../../models/rendles/rendle_game_state.model';
-import { RendleWord } from '../../models/rendles/rendle_word.model';
-const { RendleGameType, RendleContest, User, UserWallet, RendleResult, } = db;
+import { ErrorHandler } from '../../handlers/error/error.handler'
 
+const { RendleGameType, RendleContest, RendleResult, RendleGameState, RendleWord } = db;
 
-type RendleContestInput = {
-	minimumContestants: RendleContestDocument['minimumContestants'];
-	prizePool: RendleContestDocument['prizePool'];
-};
-
-const createRendleContest = async () => {
+const deleteWords = async (wordsList: any[]) => {
 	try {
-		const input: RendleContestInput = {
-			minimumContestants: 1,
-			prizePool: 0
-		}
-		const contest = await RendleContest.create(input)
-		return contest._id;
+		for (let i = 0; i < wordsList.length; i++)
+			await RendleWord.findByIdAndRemove(wordsList[i]._id)
+
 	} catch (e) {
-		logger.error(e)
 	}
 }
 
@@ -30,147 +20,58 @@ const getRendleGameTypes = async () => {
 		const rendles = await RendleGameType.find().sort({ gameType: 1 });
 		return { rendleGameTypes: rendles }
 	} catch (e) {
-		return []
-	}
-}
-
-const resetRendlesGameTypes = async () => {
-	try {
-		// await Words.collection.drop()
-		// await RendleGameState.collection.drop()
-		const rendles = await RendleGameType.find().sort({ gameType: 1 })
-		rendles.map(async (rendle, index) => {
-			if (rendle.isExpired === true) {
-				if (index === rendles.length - 1) {
-					//* first game expires
-					await rendles[0].updateOne({
-						$set: {
-							isExpired: true,
-							startsOn: null,
-							contestId: null,
-						}
-					});
-					await rendles[0].save();
-					//* second game goes live
-					await rendles[index - 1].updateOne({
-						$set: {
-							isExpired: false,
-							startsOn: Date.now(),
-						}
-					})
-					await rendles[index - 1].save()
-				} else if (index == 0) {
-					//* expire the next game
-					await rendles[index + 1].updateOne({
-						$set: {
-							isExpired: true,
-							startsOn: null,
-							contestId: null
-						}
-					})
-					await rendles[index + 1].save()
-					//* live the last game
-					await rendles[index + 2].updateOne({
-						$set: {
-							isExpired: false,
-							startsOn: Date.now()
-						}
-					})
-					await rendles[index + 2].save();
-				} else {
-					// expiring next game
-					await rendles[index + 1].updateOne({
-						$set: {
-							isExpired: true,
-							startsOn: null,
-							contestId: null
-						}
-					})
-					await rendles[index + 1].save();
-					// live first game
-					await rendles[0].updateOne({
-						$set: {
-							isExpired: false,
-							startsOn: Date.now()
-						}
-					})
-					await rendles[0].save()
-				}
-
-				const rendleContest = await createRendleContest()
-				const now = new Date(Date.now())
-				const fourHours = 60 * 60 * 4 * 1000;
-
-				let newTime: any = new Date(now.getTime() + fourHours).toUTCString()
-				newTime = new Date(newTime)
-				await rendles[index].updateOne({
-					$set: {
-						isExpired: false,
-						contestId: rendleContest,
-						startsOn: newTime,
-					}
-				})
-				await rendles[index].save()
-			}
-		})
-		return { message: `Reset of Rendle ${rendles[0].gameType} successful` }
-	} catch (e) {
-		logger.error(e)
-		return { message: `Error => ${e}` }
 	}
 }
 
 
-const enterIntoRendleContest = async (gameType: number, contestId: string, userId: string, confirm: boolean) => {
+const doesUserAlreadyInContest = async (userId: string, contestId: string) => {
 	try {
-		const user: any = await User.findById(userId)
 		const contest = await RendleContest.findById(contestId)
+		if (!contest) return ErrorHandler
 		const contestants = contest?.contestants;
 		const contestant = contestants?.find((contestant) => String(contestant) === String(userId))
-		if (contestant) return { message: "PAID", "error": false }
-
-		if (confirm) {
-			const rendleGameType = await RendleGameType.findOne({ gameType: gameType });
-			const userWallet = await UserWallet.findOne({ user: userId }) || null;
-			if ((rendleGameType?.entryFee || 0) > (userWallet?.balance || 0)) return { message: "insufficent funds", error: true }
-			contestants?.push(user);
-			await contest?.updateOne({
-				$set: {
-					contestants: contestants,
-					prizePool: contest?.prizePool + (rendleGameType?.entryFee || 0)
-				}
-			})
-			await contest?.save()
-			await userWallet?.updateOne({
-				balance: (userWallet?.balance - (rendleGameType?.entryFee || 0))
-			})
-			return { message: "OK", error: false }
-		}
-		return { message: "OK", error: false }
+		if (contestant) return true
+		return false
 	} catch (error) {
-		logger.error("error " + error)
-		return { message: `something went wrong ${error}`, error: true }
 	}
 }
+
+
+const getEntryFee = async (gameType: number) => {
+	try {
+		const rendleGameType = await RendleGameType.findOne({ gameType: gameType });
+		if (!rendleGameType) throw new Error("Object not found")
+		return rendleGameType.entryFee
+	} catch (error) {
+	}
+}
+
+const addContestantToContest = async (userId: string, contestId: string, entryFee: number) => {
+	try {
+		const contest = await RendleContest.findById(contestId);
+		const contestants = contest?.contestants;
+		contestants?.push(userId);
+		await contest?.updateOne({
+			$set: {
+				contestants: contestants,
+				prizePool: (contest?.prizePool + entryFee)
+			}
+		})
+		await contest?.save()
+	} catch (error) {
+
+	}
+}
+
 
 const getRendleContestants = async (contestId: string) => {
 	try {
 		const rendleContestants = await RendleContest.findById(contestId)
-		return { contest: rendleContestants }
+		return { contestants: rendleContestants }
 	} catch (e) {
-		return { contest: null }
 	}
 }
 
-const deleteWords = async (wordsList: any[]) => {
-	try {
-		for (let i = 0; i < wordsList.length; i++) {
-			await RendleWord.findByIdAndRemove(wordsList[i]._id)
-		}
-	} catch (e) {
-
-	}
-}
 
 const saveRendleContestResult = async (
 	gameType: number,
@@ -199,9 +100,6 @@ const saveRendleContestResult = async (
 		await RendleGameState.findOneAndRemove({ userId: userId })
 		return { message: "Successfully Posted" }
 	} catch (error) {
-		console.log(error)
-		logger.error(">> " + error)
-		return { message: "Something went wrong" }
 	}
 }
 
@@ -215,52 +113,41 @@ const getRendleParticipants = async (contestId: string) => {
 		})
 		return { participants: participants };
 	} catch (error) {
-		return []
 	}
 }
 
 
-const getRendleGameStatus = async (userId: string, contestId: string, gameType: number) => {
-	try {
-		const result = await RendleResult.findOne({ userId: userId }).where({ contestId: contestId }).exec()
-		if (result !== null) {
-			if (result)
-				return {
-					id: result?._id,
-					gameType: gameType,
-					startsOn: result?.startedOn,
-					completedOn: result?.completedOn,
-					isWon: result.isWon,
-					contestId: result.contestId,
-					isFirstGame: false
-				}
-		}
-
-		const contest = await RendleContest.findById(contestId)
-		const contestants = contest?.contestants;
-		const isParticipating = contestants?.find((c) => c._id === userId)
-		if (isParticipating) {
+const doesUserFinishedGame = async (userId: string, contestId: string) => {
+	const result = await RendleResult.findOne({ userId: userId }).where({ contestId: contestId }).exec()
+	if (result !== null) {
+		if (result)
 			return {
-				contestId: contest?._id,
+				id: result?._id,
+				startsOn: result?.startedOn,
+				completedOn: result?.completedOn,
+				isWon: result.isWon,
+				contestId: result.contestId,
 				isFirstGame: false
 			}
-		}
+	} return null
+}
 
-		return {
-			isFirstGame: true
-		}
-
-	} catch (e) {
-		return { message: e }
-	}
+const doesUserPlayingContest = async (userId: string, contestId: string) => {
+	const contest = await RendleContest.findById(contestId)
+	const contestants = contest?.contestants;
+	const isParticipating = contestants?.find((c) => String(c) === String(userId))
+	if (isParticipating) return true
+	return false
 }
 
 export {
+	addContestantToContest,
+	getEntryFee,
+	doesUserAlreadyInContest,
 	getRendleGameTypes,
-	resetRendlesGameTypes,
-	enterIntoRendleContest,
 	saveRendleContestResult,
 	getRendleParticipants,
 	getRendleContestants,
-	getRendleGameStatus
+	doesUserFinishedGame,
+	doesUserPlayingContest
 }
