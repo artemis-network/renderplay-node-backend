@@ -30,10 +30,7 @@ const rendleResultsSchema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: 'RendleContest'
 		},
-		startedOn: {
-			type: Schema.Types.Date,
-			required: true,
-		},
+		completedIn: { type: Schema.Types.Number },
 		completedOn: {
 			type: Schema.Types.Date,
 			required: true,

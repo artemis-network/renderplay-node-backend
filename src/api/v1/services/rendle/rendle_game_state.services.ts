@@ -7,7 +7,7 @@ const createGameStateForUser = async (userId: string, contestId: string) => {
 			userId: userId,
 			contestId: contestId,
 			words: [],
-			startedOn: new Date(Date.now())
+			expiresIn: new Date(Date.now() + (1000 * 60 * 10))
 		});
 		return { gameStateId: gameState?._id }
 	} catch (error) {
@@ -16,7 +16,20 @@ const createGameStateForUser = async (userId: string, contestId: string) => {
 }
 
 const getGameStateIdByUserId = async (userId: string) => {
-	return await RendleGameState.findOne({ userId: userId })
+	return await RendleGameState.findOne({ userId: userId }).populate("words").exec()
+}
+
+const getWordsFromGameState = async (userId: string) => {
+	try {
+		const gameState = await RendleGameState.findOne({ userId: userId }).populate("words").exec()
+		const words: any = gameState?.words
+		return {
+			words: words,
+			expiresIn: gameState?.expiresIn
+		}
+	} catch (e) {
+		console.log(e)
+	}
 }
 
 const updateGuessessListInGameStateByUserId = async (userId: string, word: string) => {
@@ -36,6 +49,10 @@ const updateGuessessListInGameStateByUserId = async (userId: string, word: strin
 
 }
 
+const cleanGameState = async (userId: string) => {
+	await RendleGameState.findOneAndRemove({ userId: userId })
+}
+
 const getRendleGameStateGuessessListByUserId = async (userId: string) => {
 	try {
 		const gameState: any = await RendleGameState.findOne({ userId: userId }).populate('words').exec()
@@ -51,8 +68,10 @@ const getRendleGameStateGuessessListByUserId = async (userId: string) => {
 }
 
 export {
+	cleanGameState,
 	getGameStateIdByUserId,
 	createGameStateForUser,
+	getWordsFromGameState,
 	updateGuessessListInGameStateByUserId,
 	getRendleGameStateGuessessListByUserId
 }

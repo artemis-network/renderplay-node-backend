@@ -1,20 +1,7 @@
-import mongoose from 'mongoose'
-
 import { db } from '../../models/db'
-import { logger } from '../../utils/logger';
 import { ErrorHandler } from '../../handlers/error/error.handler'
 
 const { RendleGameType, RendleContest, RendleResult, RendleGameState, RendleWord } = db;
-
-const deleteWords = async (wordsList: any[]) => {
-	try {
-		for (let i = 0; i < wordsList.length; i++)
-			await RendleWord.findByIdAndRemove(wordsList[i]._id)
-
-	} catch (e) {
-	}
-}
-
 const getRendleGameTypes = async () => {
 	try {
 		const rendles = await RendleGameType.find().sort({ gameType: 1 });
@@ -22,7 +9,6 @@ const getRendleGameTypes = async () => {
 	} catch (e) {
 	}
 }
-
 
 const doesUserAlreadyInContest = async (userId: string, contestId: string) => {
 	try {
@@ -35,7 +21,6 @@ const doesUserAlreadyInContest = async (userId: string, contestId: string) => {
 	} catch (error) {
 	}
 }
-
 
 const getEntryFee = async (gameType: number) => {
 	try {
@@ -59,10 +44,9 @@ const addContestantToContest = async (userId: string, contestId: string, entryFe
 		})
 		await contest?.save()
 	} catch (error) {
-
+		console.log(error)
 	}
 }
-
 
 const getRendleContestants = async (contestId: string) => {
 	try {
@@ -77,29 +61,24 @@ const saveRendleContestResult = async (
 	gameType: number,
 	contestId: string,
 	userId: string,
+	completedIn: number,
 	chances: number,
-	isWon: boolean
+	isWon: boolean,
+	words: any
 ) => {
 	try {
-		const rendle = await RendleGameType.findOne({ contestId: contestId })
-		const contest = mongoose.Types.ObjectId(contestId);
-		const rendleContest = await RendleContest.findById(contest);
-		const gameState: any = await RendleGameState.findOne({ userId: userId })
-		const words = gameState?.words
 		await RendleResult.create({
 			userId: userId,
 			gameType: gameType,
 			chances: chances,
+			completedIn: completedIn,
 			isWon: isWon,
 			completedOn: Date.now(),
-			startedOn: rendle?.startsOn,
-			contestId: rendleContest?._id,
+			contestId: contestId,
 			rendleWords: words
 		})
-		await deleteWords(words)
-		await RendleGameState.findOneAndRemove({ userId: userId })
-		return { message: "Successfully Posted" }
-	} catch (error) {
+	} catch (e) {
+		console.log(e)
 	}
 }
 
@@ -127,7 +106,7 @@ const doesUserFinishedGame = async (userId: string, contestId: string) => {
 				completedOn: result?.completedOn,
 				isWon: result.isWon,
 				contestId: result.contestId,
-				isFirstGame: false
+				isGameCompleted: true
 			}
 	} return null
 }

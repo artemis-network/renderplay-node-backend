@@ -1,7 +1,7 @@
 import { db } from '../../models/db'
 import { logger } from '../../utils/logger';
 
-const { RendleGameType, RendleContest } = db;
+const { RendleGameType, RendleContest, RendleGameState } = db;
 
 const createRendleContest = async () => {
 	try {
@@ -17,8 +17,7 @@ const createRendleContest = async () => {
 
 const resetRendlesGameTypes = async () => {
 	try {
-		// await Words.collection.drop()
-		// await RendleGameState.collection.drop()
+		await RendleGameState.collection.drop()
 		const rendles = await RendleGameType.find().sort({ gameType: 1 })
 		rendles.map(async (rendle, index) => {
 			if (rendle.isExpired === true) {
