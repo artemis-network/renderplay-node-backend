@@ -1,8 +1,8 @@
 import express from 'express';
 
-import { resetRendlesGameTypesController } from '../controllers/rendle/rendle_init.controller'
+import { resetRendlesGameTypesController } from '../controllers/rendle/rendle_reset.controller'
 import { getRendleCurrentGuessesController, updateCurrentGuessesController } from '../controllers/rendle/rendle_game_state.controller'
-import { getRendleGameTypesController, getRendleContestantsController, getRendleParticipantsController, } from '../controllers/rendle/rendle_game.controller'
+import { getRendleGameTypesController, getRendleContestantsController, getRendleParticipantsController, } from '../controllers/rendle/rendle.controller'
 
 import { saveRendleContestResultController } from '../controllers/rendle/save_rendle_contest.controller'
 import { enterRendlesContestController } from '../controllers/rendle/enter_into_rendle_contest.controller'

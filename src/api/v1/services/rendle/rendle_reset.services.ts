@@ -15,7 +15,7 @@ const createRendleContest = async () => {
 	}
 }
 
-const resetRendlesGameTypes = async () => {
+export const resetRendlesGameTypes = async () => {
 	try {
 		await RendleGameState.collection.drop()
 		const rendles = await RendleGameType.find().sort({ gameType: 1 })
@@ -98,8 +98,4 @@ const resetRendlesGameTypes = async () => {
 		logger.error(e)
 		return { message: `Error => ${e}` }
 	}
-}
-
-export {
-	resetRendlesGameTypes
 }

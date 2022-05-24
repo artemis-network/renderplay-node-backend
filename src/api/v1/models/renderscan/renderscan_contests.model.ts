@@ -5,7 +5,7 @@ import { RenderScanRefWordDocument } from './renderscan_ref_word.modal'
 type RenderScanContestDocument = Document & {
 	prizePool: number,
 	minimumContestants: number,
-	contestants: Array<UserDocument>,
+	contestants: string[],
 	refWord: RenderScanRefWordDocument
 };
 

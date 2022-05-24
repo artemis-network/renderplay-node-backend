@@ -4,14 +4,14 @@ import multer from 'multer';
 const router = express.Router();
 
 import {
-	getRenderScanTypesController,
-	getRenderScanContestantsController,
-	getRenderScanParticipantsController,
-	getRenderScanGameStatusController,
-	enterIntoRenderScanContestController,
+	getRenderScanTypesController, getRenderScanContestantsController, getRenderScanParticipantsController,
 	saveRenderScanContestResultController,
-	resetRenderScanGamesController
 } from '../controllers/renderscan/renderscan.controller'
+
+
+import { enterIntoRenderScanContestController } from '../controllers/renderscan/enter_into_renderscan_contest.controller'
+import { getRenderScanGameStatusController } from '../controllers/renderscan/get_renderscan_contest_status.controller'
+import { resetRenderScanGamesController } from '../controllers/renderscan/renderscan_reset.controller'
 
 
 import { renderscanPrefix } from '../config'
