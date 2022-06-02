@@ -36,7 +36,8 @@ const createRendleContest = async (gameType: number) => {
 
 const createRendleGameType = async (rendleGameType: RendleGameType) => {
 	try {
-		logger.info(`>> creating rendle ${rendleGameType.gameType}`)
+		logger.info(`>> creating rendle ${rendleGameType.gameType} game`)
+		logger.info(`>> rendle ${rendleGameType.gameType} has startson field set to ${rendleGameType.startsOn} `)
 		if (!rendleGameType.isExpired) {
 			const contestId = await createRendleContest(rendleGameType.gameType);
 			const input: RendleGameTypeInput = {
