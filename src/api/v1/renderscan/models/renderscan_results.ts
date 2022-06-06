@@ -10,6 +10,6 @@ const renderScanResultsSchema = new Schema({
 	scanId: [{ type: Schema.Types.ObjectId, ref: "RENDERSCAN" }],
 });
 
-const RenderScanResults: RenderScanResultModel = mongoose.model<RenderScanResultDoc>('RENDERSCAN_RESULTS', renderScanResultsSchema);
+const RenderScanResults: RenderScanResultModel = mongoose.model<RenderScanResultDoc>('RENDERSCAN_RESULT', renderScanResultsSchema);
 
 export { RenderScanResults, RenderScanResultDoc };

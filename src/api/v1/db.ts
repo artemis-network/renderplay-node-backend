@@ -9,7 +9,7 @@ import { RenderverseEmails, RenderverseEmailsDocument, } from './user/models/ren
 
 import { RendleWord, RendleWordDocument, } from './rendles/models/rendle_word.model'
 import { RendleContest, RendleContestDocument } from './rendles/models/rendle_contest.model'
-import { RendleResult, RendleResultsDocument, } from './rendles/models/rendle_results.model'
+import { RendleResult, RendleResultsDocument, } from './rendles/models/rendle_result.model'
 import { RendleGameType, RendleGameTypeDocument, } from './rendles/models/rendle_game_type.model'
 import { RendleGameState, RendleGameStateDocument, } from './rendles/models/rendle_game_state.model'
 
@@ -43,8 +43,6 @@ const db = {
 	RendleGameType,
 	RendleGameState,
 	RenderverseEmails,
-
-
 }
 
 export {
