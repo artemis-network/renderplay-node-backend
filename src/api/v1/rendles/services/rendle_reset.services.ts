@@ -13,7 +13,7 @@ const createRendleContest = async () => {
 
 export const resetRendlesGameTypes = async () => {
 	await RendleGameState.collection.drop()
-	const rendles = await RendleGameType.find().sort({ gameType: 1 })
+	const rendles = await RendleContest.find().sort({ gameType: 1 })
 	rendles.map(async (rendle, index) => {
 		if (rendle.isExpired === true) {
 			if (index === rendles.length - 1) {

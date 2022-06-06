@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getRendleGameTypes, getRendleParticipants, getRendleContestants }
+import { getRendleGameTypes, getRendleParticipants, getRendleContestants, getRendleContests }
 	from '../services/rendle.services'
 
 // @desc get rendle contests
@@ -8,6 +8,15 @@ import { getRendleGameTypes, getRendleParticipants, getRendleContestants }
 export const getRendleGameTypesController = async (req: Request, res: Response) => {
 	const rendles = await getRendleGameTypes();
 	return res.status(200).json(rendles);
+}
+
+export const getRendleContestsController = async (req: Request, res: Response) => {
+	try {
+		const rendles = await getRendleContests();
+		return res.status(200).json(rendles);
+	} catch (e) {
+		return res.status(200).json(e);
+	}
 }
 
 // @desc get rendle participants
