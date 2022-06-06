@@ -10,7 +10,7 @@ const renderScanSchema = new Schema({
 	user: { type: Schema.Types.ObjectId, ref: 'USER' }
 });
 
-const RenderScan: RenderScanModel = mongoose.model<RenderScanDoc>('RENDERSCAN', renderScanSchema);
+const RenderScan: RenderScanModel = mongoose.model<RenderScanDoc>('Renderscan', renderScanSchema);
 
 
 export { RenderScan, RenderScanDoc, RenderScanModel };

@@ -17,6 +17,6 @@ const renderScanQuizQuestionSchema = new Schema({
 
 const RenderScanQuizQuestion: RenderScanQuizQuestionModel
 	= mongoose.model
-		<RenderScanQuizQuestionDoc>('RENDERSCAN_QUIZ_QUESTION', renderScanQuizQuestionSchema);
+		<RenderScanQuizQuestionDoc>('Renderscan_Quiz_Question', renderScanQuizQuestionSchema);
 
 export { RenderScanQuizQuestion, RenderScanQuizQuestionDoc };

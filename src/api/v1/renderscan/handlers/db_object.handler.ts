@@ -1,19 +1,18 @@
 import { ExceptionHandler } from '../../exceptions/db.exceptions'
-import { renderScanDomainObjects, RENDER_SCAN_MODEL } from '../renderscan.objects'
+import { renderScanDomainObjects, } from '../renderscan.objects'
 
 const {
 	RenderScan,
 	RenderScanQuiz, RenderScanResults, RenderScanContest,
-	RenderScanRefWord, RenderScanGameType, RenderScanQuizQuestion
+	RenderScanGameType, RenderScanQuizQuestion
 } = renderScanDomainObjects
 
-type RenderScanModels = RENDER_SCAN_MODEL;
 
 
 export class RenderScanDocumentFactory {
 	static get(renderScanDocs: string) {
 		if (renderScanDocs === "renderscan") {
-			const newObject: RENDER_SCAN_MODEL = RenderScan;
+			const newObject = RenderScan;
 			return newObject;
 		}
 		if (renderScanDocs === "renderscan_contest") {
@@ -25,10 +24,10 @@ export class RenderScanDocumentFactory {
 }
 
 export class DBObject {
-	doc: RenderScanModels;
-	constructor(doc: RenderScanModels) { this.doc = doc }
+	doc: any;
+	constructor(doc: any) { this.doc = doc }
 
-	isDocPresent(doc: RenderScanModels): boolean {
+	isDocPresent(doc: any): boolean {
 		if (this.doc !== null || this.doc !== undefined) return true
 		return false
 	}

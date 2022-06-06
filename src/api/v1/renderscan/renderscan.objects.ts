@@ -1,4 +1,4 @@
-import { RenderScan, RenderScanDoc, RenderScanModel } from './models/renderscan.model'
+import { RenderScan, RenderScanDoc } from './models/renderscan.model'
 import { RenderScanQuiz, RenderScanQuizDoc } from './models/renderscan_quiz.model'
 import { RenderScanResults, RenderScanResultDoc } from './models/renderscan_results'
 import { RenderScanContest, RenderScanContestDoc } from './models/renderscan_contests.model'
@@ -13,8 +13,6 @@ export const renderScanDomainObjects = {
 	RenderScanGameType,
 	RenderScanQuizQuestion,
 }
-
-export { RenderScanModel }
 
 export {
 	RenderScanDoc,

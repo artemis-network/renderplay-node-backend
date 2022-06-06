@@ -6,14 +6,14 @@ interface RenderScanQuizDoc extends RenderScanQuiz, Document { }
 interface RenderScanQuizModel extends Model<RenderScanQuizDoc> { }
 
 const renderScanQuizSchema = new Schema({
-	contest: { type: Schema.Types.ObjectId, ref: "RENDERSCAN_CONTEST" },
-	questions: [{ type: Schema.Types.ObjectId, ref: "RENDERSCAN_QUIZ_QUESTION", required: true }],
+	contest: { type: Schema.Types.ObjectId, ref: "Renderscan_Contest" },
+	questions: [{ type: Schema.Types.ObjectId, ref: "Renderscan_Quiz_Question", required: true }],
 	lobbyExpiresAt: { type: Schema.Types.Date, required: true }
 });
 
 
 const RenderScanQuiz: RenderScanQuizModel = mongoose.model<RenderScanQuizDoc>(
-	'RENDERSCAN_QUIZ',
+	'Renderscan_Quiz',
 	renderScanQuizSchema
 )
 

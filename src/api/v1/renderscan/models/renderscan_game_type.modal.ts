@@ -17,6 +17,6 @@ const renderScanGameTypeSchema = new Schema({
 	filename: { type: Schema.Types.String, required: true },
 });
 
-const RenderScanGameType: RenderScanGameTypeModel = mongoose.model<RenderScanGameTypeDoc>('RENDERSCAN_GAME_TYPE', renderScanGameTypeSchema);
+const RenderScanGameType: RenderScanGameTypeModel = mongoose.model<RenderScanGameTypeDoc>('Renderscan_Game_Type', renderScanGameTypeSchema);
 
 export { RenderScanGameType, RenderScanGameTypeDoc };
