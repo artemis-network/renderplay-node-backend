@@ -6,7 +6,7 @@ const { RenderScanQuiz, RenderScanContest, RenderScanGameType, RenderScanQuizQue
 
 interface QuizQuestion { question: string; anwser: string; imageUrl: string; opensAt: Date }
 interface RenderScanGameTypeObject { entryFee: number, gameType: string, category: string, filename: string };
-interface RenderScanContest { gameType: string; startsOn: Date; prizePool: number; contestants: string[]; mininumContestants: number; quiz: Object; }
+interface RenderScanContest { entryFee: number; gameType: string; startsOn: Date; prizePool: number; contestants: string[]; mininumContestants: number; quiz: Object; }
 
 enum RenderScanGameTypeEnum { FREE = "[FREE]", PAID = "[PAID]" }
 enum RenderScanCategory { SPORTS = '[SPORTS]', CELEBRITY = '[CELEBRITY]', GEOGRAPHY = '[GEOGRAPHY]', GENERAL = '[GENERAL]', ANIMALS = '[ANIMALS]', }
@@ -54,7 +54,9 @@ const createQuizQuestionsForRenderScanContest = async (questions: QuizQuestion[]
 
 const createRenderScanContest = async (renderScanObject: RenderScanContest, gameType: string, filename: string) => {
 	const renderscan = await RenderScanContest.create({
-		gameType: renderScanObject.gameType, startsOn: renderScanObject.startsOn,
+		gameType: renderScanObject.gameType,
+		entryFee: renderScanObject.entryFee,
+		startsOn: renderScanObject.startsOn,
 		prizePool: renderScanObject.prizePool,
 		minimumContestants: renderScanObject.mininumContestants,
 		contestants: renderScanObject.contestants,
@@ -62,8 +64,6 @@ const createRenderScanContest = async (renderScanObject: RenderScanContest, game
 	const lobbyExpiresAt: Date = new Date(new Date(renderScanObject.startsOn).getTime() + (1000 * 60 * 10));
 	const questionsFromTsv = await readTsvQuizQuestionsFile(gameType, filename);
 	const questions = await createQuizQuestionsForRenderScanContest(questionsFromTsv, lobbyExpiresAt);
-	console.log(questionsFromTsv)
-	console.log(questions)
 	const quiz = await RenderScanQuiz.create({ contest: renderscan?._id, questions: questions, lobbyExpiresAt: lobbyExpiresAt })
 	await renderscan.updateOne({ $set: { quiz: quiz?._id } })
 }
@@ -80,7 +80,9 @@ const createRenderScanContests = async () => {
 		const now = new Date().getTime();
 		const contestTime: Date = new Date(now + (freeGameTypeTimeInterval * hour))
 		await createRenderScanContest({
-			gameType: freeGameTypes[i]._id, startsOn: contestTime,
+			gameType: freeGameTypes[i]._id,
+			startsOn: contestTime,
+			entryFee: freeGameTypes[i].entryFee,
 			mininumContestants: 0, prizePool: 0, contestants: [], quiz: ""
 		}, freeGameTypes[i].gameType, freeGameTypes[i].filename)
 
@@ -91,8 +93,13 @@ const createRenderScanContests = async () => {
 		const now = new Date().getTime();
 		const contestTime: Date = new Date(now + (paidGameTypeTimeInterval * hour))
 		await createRenderScanContest({
-			gameType: paidGameTypes[i]._id, startsOn: contestTime,
-			mininumContestants: 0, prizePool: 0, contestants: [], quiz: ""
+			gameType: paidGameTypes[i]._id,
+			startsOn: contestTime,
+			entryFee: paidGameTypes[i].entryFee,
+			mininumContestants: 0,
+			prizePool: 0,
+			contestants: [],
+			quiz: ""
 		}, paidGameTypes[i].gameType, paidGameTypes[i].filename)
 
 		paidGameTypeTimeInterval += 2;
