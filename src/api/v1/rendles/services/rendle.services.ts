@@ -8,8 +8,21 @@ export const getRendleGameTypes = async () => {
 }
 
 export const getRendleContests = async () => {
-	const rendles = await RendleContest.find().where({isVisible:true})
-	return { rendleContests: rendles }
+	const rendles: any = await RendleContest.find().where({ isVisible: true }).populate("gameType").sort({ gameType: 1 }).exec();
+	const serializedRendles = []
+	for (let i = 0; i < rendles.length; i++) {
+		const id = rendles[i]._id
+		const gameType = rendles[i].gameType?.gameType;
+		const startsOn = rendles[i].startsOn;
+		const entryFee = rendles[i].entryFee
+		serializedRendles.push({
+			_id: id,
+			gameType: gameType,
+			startsOn: startsOn,
+			entryFee: entryFee
+		})
+	}
+	return { rendleContests: serializedRendles }
 }
 
 export const getRendleContestants = async (contestId: string) => {
@@ -35,10 +48,9 @@ export const doesUserAlreadyInRendleContest = async (userId: string, contestId: 
 	return false
 }
 
-export const getRendleGameTypeEntryFee = async (gameType: number) => {
-	const rendleGameType = await RendleGameType.findOne({ gameType: gameType });
-	if (!rendleGameType) throw new Error("Object not found")
-	return rendleGameType.entryFee
+export const getRendleContestEntryFee = async (id: number) => {
+	const contest = await RendleContest.findById(id);
+	return contest?.entryFee || 0
 }
 
 export const addUserToRendleContest = async (userId: string, contestId: string, entryFee: number) => {

@@ -8,6 +8,7 @@ type RendleContestDocument = Document & {
 	isVisible: Boolean,
 	contestants: string[],
 	gameType: string
+	entryFee: number,
 };
 
 const rendleContestSchema = new Schema(
@@ -33,8 +34,14 @@ const rendleContestSchema = new Schema(
 			required: true,
 			default: 0
 		},
+		entryFee: {
+			type: Schema.Types.Number,
+			required: true,
+			default: 0
+		},
 		gameType: {
-			type: Schema.Types.String,
+			type: Schema.Types.ObjectId,
+			ref: 'Rendle_Game_Type',
 			requried: false,
 		},
 		contestants: [{ type: Schema.Types.ObjectId, ref: 'User' }]
@@ -42,6 +49,6 @@ const rendleContestSchema = new Schema(
 );
 
 
-const RendleContest: Model<RendleContestDocument> = mongoose.model<RendleContestDocument>('RendleContest', rendleContestSchema);
+const RendleContest: Model<RendleContestDocument> = mongoose.model<RendleContestDocument>('Rendle_Contest', rendleContestSchema);
 
 export { RendleContest, RendleContestDocument };

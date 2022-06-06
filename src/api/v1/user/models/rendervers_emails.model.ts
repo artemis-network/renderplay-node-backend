@@ -19,6 +19,6 @@ const renderverseEmailsSchema = new Schema(
 );
 
 
-const RenderverseEmails: Model<RenderverseEmailsDocument> = mongoose.model<RenderverseEmailsDocument>('RenderverseEmails', renderverseEmailsSchema);
+const RenderverseEmails: Model<RenderverseEmailsDocument> = mongoose.model<RenderverseEmailsDocument>('Renderverse_Email', renderverseEmailsSchema);
 
 export { RenderverseEmails, RenderverseEmailsInput, RenderverseEmailsDocument };

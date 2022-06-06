@@ -22,6 +22,6 @@ const UserWalletSchema = new Schema(
 );
 
 
-const UserWallet: Model<UserWalletDocument> = mongoose.model<UserWalletDocument>('UserWallet', UserWalletSchema);
+const UserWallet: Model<UserWalletDocument> = mongoose.model<UserWalletDocument>('User_Wallet', UserWalletSchema);
 
 export { UserWallet, UserWalletDocument };

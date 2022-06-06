@@ -4,7 +4,7 @@ import { resetRendlesGameTypesController } from './controllers/reset_rendle_cont
 import { getRendleCurrentGuessesController } from './controllers/get_gamestate_of_rendles'
 import { updateCurrentGuessesController } from './controllers/set_gamestate_of_rendles'
 
-import { getRendleContestsController, getRendleContestantsController, getRendleParticipantsController, } from './controllers/get_rendle_users.controller'
+import { getRendleContestsController } from './controllers/get_rendle_contests'
 
 import { saveRendleContestResultController } from './controllers/save_rendle_contest.controller'
 import { enterRendlesContestController } from './controllers/enter_into_rendle_contest.controller'
@@ -24,8 +24,6 @@ router.post(`${rendlesPrefix}/enter`, enterRendlesContestController);
 router.post(`${rendlesPrefix}/status`, getRendleGameStatusController);
 router.post(`${rendlesPrefix}/save`, saveRendleContestResultController);
 
-router.post(`${rendlesPrefix}/contestants`, getRendleContestantsController);
-router.post(`${rendlesPrefix}/participants`, getRendleParticipantsController);
 
 router.post(`${rendlesPrefix}/words`, getRendleCurrentGuessesController);
 router.post(`${rendlesPrefix}/words/update`, updateCurrentGuessesController);

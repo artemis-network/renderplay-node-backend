@@ -7,17 +7,17 @@ const { RendleGameType, RendleContest } = db
 
 type RendleGameTypeInput = {
 	gameType: RendleGameTypeDocument['gameType'];
-	entryFee: RendleGameTypeDocument['entryFee'],
 };
 
 type RendleContestInput = {
 	minimumContestants: RendleContestDocument['minimumContestants'];
-	startsOn?:RendleContestDocument['startsOn'];
+	startsOn?: RendleContestDocument['startsOn'];
 	isExpired: RendleContestDocument['isExpired'],
 	isVisible: RendleContestDocument['isVisible'],
 	prizePool: RendleContestDocument['prizePool'];
 	contestants: RendleContestDocument['contestants'];
 	gameType: RendleContestDocument['gameType'];
+	entryFee: RendleContestDocument['entryFee']
 };
 
 type gameTypeExpiryStatus = {
@@ -46,13 +46,14 @@ const gameTypeStartsOn: gameTypeStartsOn = {
 	7: null
 }
 
-const createRendleContest = async (gameType: number, gameTypeId: RendleGameTypeDocument) => {
+const createRendleContest = async (gameType: number, entryFee: number, gameTypeId: RendleGameTypeDocument) => {
 	try {
 		logger.info(`>> creating new contest for Rendle ${gameType} with StartsOn ${gameTypeStartsOn[gameType]}`)
 		const input: RendleContestInput = {
+			entryFee: entryFee,
 			minimumContestants: 1,
 			prizePool: 0,
-			startsOn:gameTypeStartsOn[gameType],
+			startsOn: gameTypeStartsOn[gameType],
 			isExpired: gameTypeExpiryStatus[gameType],
 			isVisible: true,
 			contestants: [],
@@ -69,12 +70,9 @@ const createRendleContest = async (gameType: number, gameTypeId: RendleGameTypeD
 const createRendleGameType = async (rendleGameType: RendleGameType) => {
 	try {
 		logger.info(`>> creating rendle ${rendleGameType.gameType}`)
-		const input: RendleGameTypeInput = {
-			gameType: rendleGameType.gameType,
-			entryFee: rendleGameType.entryFee,
-		}
+		const input: RendleGameTypeInput = { gameType: rendleGameType.gameType }
 		const gameTypeId = await RendleGameType.create(input)
-		await createRendleContest(rendleGameType.gameType, gameTypeId);
+		await createRendleContest(rendleGameType.gameType, rendleGameType.entryFee, gameTypeId);
 		logger.info(`>> created rendle contest => ${rendleGameType.gameType}`)
 	} catch (e) {
 		logger.error(e)

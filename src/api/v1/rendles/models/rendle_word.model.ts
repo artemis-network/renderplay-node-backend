@@ -14,6 +14,6 @@ const rendleWordSchema = new Schema(
 );
 
 
-const RendleWord: Model<RendleWordDocument> = mongoose.model<RendleWordDocument>('RendleWord', rendleWordSchema);
+const RendleWord: Model<RendleWordDocument> = mongoose.model<RendleWordDocument>('Rendle_Word', rendleWordSchema);
 
 export { RendleWord, RendleWordDocument };

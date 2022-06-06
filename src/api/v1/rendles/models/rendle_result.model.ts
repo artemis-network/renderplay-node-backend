@@ -28,7 +28,7 @@ const rendleResultsSchema = new Schema(
 		},
 		contestId: {
 			type: Schema.Types.ObjectId,
-			ref: 'RendleContest'
+			ref: 'Rendle_Contest'
 		},
 		completedIn: { type: Schema.Types.Number },
 		completedOn: {
@@ -50,13 +50,13 @@ const rendleResultsSchema = new Schema(
 		rendleWords: [
 			{
 				type: Schema.Types.ObjectId,
-				ref: 'RendleWord'
+				ref: 'Rendle_Word'
 			}
 		]
 	},
 );
 
 
-const RendleResult: Model<RendleResultsDocument> = mongoose.model<RendleResultsDocument>('RendleResults', rendleResultsSchema);
+const RendleResult: Model<RendleResultsDocument> = mongoose.model<RendleResultsDocument>('Rendle_Result', rendleResultsSchema);
 
 export { RendleResult, RendleResultsInput, RendleResultsDocument };
