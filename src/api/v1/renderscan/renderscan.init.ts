@@ -99,8 +99,15 @@ const createRenderScanContests = async () => {
 	}
 }
 
-export const renderScanResetOneByContesyId = async (contestId: string, gameType: string, filename: string) => {
-	const renderscan = await RenderScanContest.findById(contestId)
+export const renderScanResetOneByContesyId = async (gameType: string, filename: string) => {
+
+	const renderscan = await RenderScanContest.create({
+		gameType: gameType,
+		prizePool: 0,
+		startsOn: new Date(),
+		minimumContestants: 50,
+		contestants: []
+	})
 	const lobbyExpiresAt: Date = new Date(new Date().getTime() + (1000 * 60 * 10));
 	const questionsFromTsv = await readTsvQuizQuestionsFile(gameType, filename);
 	const questions = await createQuizQuestionsForRenderScanContest(questionsFromTsv, lobbyExpiresAt);
