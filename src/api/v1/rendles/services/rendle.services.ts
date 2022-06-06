@@ -8,7 +8,7 @@ export const getRendleGameTypes = async () => {
 }
 
 export const getRendleContests = async () => {
-	const rendles = await RendleContest.find()
+	const rendles = await RendleContest.find().where({isVisible:true})
 	return { rendleContests: rendles }
 }
 

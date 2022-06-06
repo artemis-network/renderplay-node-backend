@@ -14,6 +14,6 @@ export const createRenderScanContestQuizQuestionsControllers = async (req: Reque
 // @access private
 export const createRenderScanContestQuizQuestionsOneControllers = async (req: Request, res: Response) => {
 	const { contestId, gameType, filename } = req.body
-	await renderScanResetOneByContesyId(contestId, gameType, filename)
+	await renderScanResetOneByContesyId(gameType, filename)
 	return res.status(200).json({ message: "ok" })
 }

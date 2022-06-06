@@ -2,12 +2,13 @@ import { db } from '../db'
 import { createUser } from '../user/services/user.service'
 import { depositFunds } from '../user/services/wallet.service';
 import { logger } from '../utils/logger';
+import { Request, Response } from 'express';
 
 const { User } = db
 
 import { ADMIN } from '../../../config'
 
-const initUser = async () => {
+const initUser = async (req: Request, res: Response) => {
 	try {
 		const deposit: number = 1000000
 		const users = await (await User.find()).length
@@ -19,8 +20,9 @@ const initUser = async () => {
 			console.log(details)
 			logger.info(">> successfully admin user")
 		}
+		return res.status(200).json({ message: "ok" })
 	} catch (e) {
-		return e;
+		return res.status(400).json({ message: e });
 	}
 }
 
