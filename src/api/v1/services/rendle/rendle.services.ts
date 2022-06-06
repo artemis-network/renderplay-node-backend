@@ -10,6 +10,11 @@ export const getRendleGameTypes = async () => {
 	return { rendleGameTypes: rendles }
 }
 
+export const getRendleContests = async () => {
+	const rendles = await RendleContest.find()
+	return { rendleContests: rendles }
+}
+
 export const getRendleContestants = async (contestId: string) => {
 	const rendleContestants = await RendleContest.findById(contestId)
 	return { rendleContestants: rendleContestants }
