@@ -6,10 +6,10 @@ import { PORT } from './config';
 import { json } from 'body-parser';
 import { logger } from './api/v1/utils/logger';
 
-import { pingRoutes } from './api/v1/routes/ping.route';
-import { userRoutes } from './api/v1/routes/user.routes'
-import { rendleRoutes } from './api/v1/routes/rendle.routes'
-import { renderScanRoutes } from './api/v1/routes/renderscan.routes'
+import { pingRoutes } from './api/v1/main.route';
+import { userRoutes } from './api/v1/user/user.routes'
+import { rendleRoutes } from './api/v1/rendles/rendle.routes'
+import { renderScanRoutes } from './api/v1/renderscan/renderscan.routes'
 
 const app = express();
 
