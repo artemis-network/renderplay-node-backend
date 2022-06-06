@@ -100,7 +100,6 @@ const createRenderScanContests = async () => {
 }
 
 export const renderScanResetOneByContesyId = async (gameType: string, filename: string) => {
-
 	const renderscan = await RenderScanContest.create({
 		gameType: gameType,
 		prizePool: 0,

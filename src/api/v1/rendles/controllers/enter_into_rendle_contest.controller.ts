@@ -13,9 +13,11 @@ enum RendleContestState {
 // @route /backend/v1/rendles/enter
 // @access public
 export const enterRendlesContestController = async (req: Request, res: Response) => {
+
 	const { gameType, contestId, userId, request } = req.body
 
 	const isInContest = await doesUserAlreadyInRendleContest(userId, contestId);
+
 	if (isInContest) {
 		const gameStateId = await getGameStateIdByUserId(userId)
 		return res.status(200).json({
@@ -27,6 +29,7 @@ export const enterRendlesContestController = async (req: Request, res: Response)
 
 	const gameEntryFee: any = await getRendleGameTypeEntryFee(gameType);
 	const balance: any = await getBalance(userId);
+
 	if (gameEntryFee > balance) return res.status(200).json({
 		message: "insufficent funds", status: RendleContestState.INSUFFICENT_FUNDS
 	})
