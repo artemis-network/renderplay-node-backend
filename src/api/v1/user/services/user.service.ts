@@ -111,6 +111,19 @@ const createUser = async (username: string, email: string, password: string) => 
 	}
 }
 
+const setUserWalletAddress = async (walletAddress: string, userId: string) => {
+	const user = await User.findById(userId)
+	if (user?.metamaskAddress === "") {
+		await user?.updateOne({
+			$set: {
+				metamaskAddress: walletAddress
+			}
+		})
+		await user?.save()
+		return { message: "ok" }
+	}
+}
+
 
 const loginUser = async (username: string, password: string) => {
 	try {
@@ -303,4 +316,4 @@ const googleMobileLogin = async (email: string) => {
 
 
 
-export { createUser, loginUser, googleLogin, googleMobileLogin }
+export { createUser, loginUser, googleLogin, googleMobileLogin, setUserWalletAddress }

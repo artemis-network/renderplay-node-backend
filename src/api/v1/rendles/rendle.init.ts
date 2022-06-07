@@ -38,7 +38,7 @@ const gameTypeExpiryStatus: gameTypeExpiryStatus = {
 const gameTypeStartsOn: gameTypeStartsOn = {
 	5: getCurrentIndianDateTime(),
 	6: new Date((getCurrentIndianDateTime().getTime() + 4 * 60 * 60 * 1000)),
-	7: null
+	7: new Date(0)
 }
 
 const addTimeToDate = (date: Date, timeInMilliseconds: number): Date => new Date(date.getTime() + timeInMilliseconds)

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { createUser, loginUser, googleLogin, googleMobileLogin } from '../services/user.service'
+import { createUser, loginUser, googleLogin, googleMobileLogin, setUserWalletAddress } from '../services/user.service'
 
 export const createUserController = async (req: Request, res: Response) => {
 	const { username, email, password, } = req.body;
@@ -7,6 +7,12 @@ export const createUserController = async (req: Request, res: Response) => {
 	return res.status(200).json(result)
 
 };
+
+export const setUserWalletAddressController = async (req: Request, res: Response) => {
+	const { userId, walletAddress } = req.body;
+	const result = await setUserWalletAddress(walletAddress, userId);
+	return res.status(200).json(result)
+}
 
 export const createGoogleUserController = async (req: Request, res: Response) => {
 	const { token } = req.body;
