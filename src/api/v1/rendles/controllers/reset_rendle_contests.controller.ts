@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getRendlesByIsVisible, resetRendlesGameState, setRendleIsVisibleToFalse, getRendleGameTypes, createRendleContest } from '../services/rendle_reset.services'
+import { getRendlesByIsVisible, setRendleIsVisibleAndIsExpiredToFalse, createRendleContest } from '../services/rendle_reset.services'
 
 // @desc reset all rendle contests
 // @route /backend/v1/rendles/reset
@@ -19,7 +19,7 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 						gameType: rendles[0].gameType.gameType,
 						startsOn: null,
 					})
-					setRendleIsVisibleToFalse(rendles[0])
+					setRendleIsVisibleAndIsExpiredToFalse(rendles[0])
 					//* second game goes live
 					await createRendleContest({
 						gameTypeId: rendles[index - 1].gameType._id,
@@ -27,7 +27,7 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 						gameType: rendles[index - 1].gameType.gameType,
 						startsOn: new Date(),
 					})
-					setRendleIsVisibleToFalse(rendles[index - 1])
+					setRendleIsVisibleAndIsExpiredToFalse(rendles[index - 1])
 				} else if (index == 0) {
 					//* expire the next game
 					await createRendleContest({
@@ -36,7 +36,7 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 						gameType: rendles[index + 1].gameType.gameType,
 						startsOn: null,
 					})
-					setRendleIsVisibleToFalse(rendles[index + 1])
+					setRendleIsVisibleAndIsExpiredToFalse(rendles[index + 1])
 					//* live the last game
 					await createRendleContest({
 						gameTypeId: rendles[index + 2].gameType._id,
@@ -44,7 +44,7 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 						gameType: rendles[index + 2].gameType.gameType,
 						startsOn: new Date(),
 					})
-					setRendleIsVisibleToFalse(rendles[index + 2])
+					setRendleIsVisibleAndIsExpiredToFalse(rendles[index + 2])
 				} else {
 					// expiring next game
 					await createRendleContest({
@@ -53,7 +53,7 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 						startsOn: null,
 						gameType: rendles[index + 1].gameType.gameType,
 					})
-					setRendleIsVisibleToFalse(rendles[index + 1])
+					setRendleIsVisibleAndIsExpiredToFalse(rendles[index + 1])
 					// live first game
 					await createRendleContest({
 						gameTypeId: rendles[0].gameType._id,
@@ -61,7 +61,7 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 						startsOn: new Date(),
 						gameType: rendles[0].gameType.gameType,
 					})
-					setRendleIsVisibleToFalse(rendles[0])
+					setRendleIsVisibleAndIsExpiredToFalse(rendles[0])
 				}
 
 				const now = new Date(new Date())
@@ -76,7 +76,7 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 					startsOn: newTime,
 					gameType: rendles[index].gameType.gameType,
 				})
-				setRendleIsVisibleToFalse(rendles[index])
+				setRendleIsVisibleAndIsExpiredToFalse(rendles[index])
 			}
 		})
 

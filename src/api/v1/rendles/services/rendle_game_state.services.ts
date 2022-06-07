@@ -7,7 +7,6 @@ const createGameStateForUser = async (userId: string, contestId: string) => {
 			userId: userId,
 			contestId: contestId,
 			words: [],
-			expiresIn: new Date(new Date().getTime() + (1000 * 60 * 10))
 		});
 		return { gameStateId: gameState?._id }
 	} catch (error) {
@@ -23,10 +22,7 @@ const getWordsFromGameState = async (userId: string) => {
 	try {
 		const gameState = await RendleGameState.findOne({ userId: userId }).populate("words").exec()
 		const words: any = gameState?.words
-		return {
-			words: words,
-			expiresIn: gameState?.expiresIn
-		}
+		return { words: words }
 	} catch (e) {
 		console.log(e)
 	}
@@ -49,9 +45,7 @@ const updateGuessessListInGameStateByUserId = async (userId: string, word: strin
 
 }
 
-const cleanGameState = async (userId: string) => {
-	await RendleGameState.findOneAndRemove({ userId: userId })
-}
+const cleanGameState = async (userId: string) => await RendleGameState.findOneAndRemove({ userId: userId })
 
 const getRendleGameStateGuessessListByUserId = async (userId: string) => {
 	try {
@@ -61,7 +55,7 @@ const getRendleGameStateGuessessListByUserId = async (userId: string) => {
 		for (let i = 0; i < words.length; i++) {
 			guesses.push(await words[i].guess)
 		}
-		return { guesses: guesses, startedOn: gameState?.startedOn }
+		return { guesses: guesses }
 	} catch (error) {
 		return { message: `Something went wrong ${error}` }
 	}

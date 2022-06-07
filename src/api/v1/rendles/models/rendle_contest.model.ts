@@ -9,6 +9,8 @@ type RendleContestDocument = Document & {
 	contestants: string[],
 	gameType: string
 	entryFee: number,
+	opensAt?: Date,
+	expiresAt?: Date
 };
 
 const rendleContestSchema = new Schema(
@@ -18,6 +20,14 @@ const rendleContestSchema = new Schema(
 			required: true,
 		},
 		startsOn: {
+			type: Schema.Types.Date,
+			required: false
+		},
+		opensAt: {
+			type: Schema.Types.Date,
+			required: false
+		},
+		expiresAt: {
 			type: Schema.Types.Date,
 			required: false
 		},

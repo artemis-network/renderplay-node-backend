@@ -5,34 +5,29 @@ import moment from 'moment'
 
 const { RendleGameType, RendleContest } = db
 
-type RendleGameTypeInput = {
-	gameType: RendleGameTypeDocument['gameType'];
-};
+type RendleGameTypeInput = { gameType: RendleGameTypeDocument['gameType']; };
 
 type RendleContestInput = {
 	minimumContestants: RendleContestDocument['minimumContestants'];
 	startsOn?: RendleContestDocument['startsOn'];
-	isExpired: RendleContestDocument['isExpired'],
-	isVisible: RendleContestDocument['isVisible'],
+	isExpired: RendleContestDocument['isExpired'];
+	expiresAt?: RendleContestDocument['expiresAt'];
+	opensAt?: RendleContestDocument['opensAt'];
+	isVisible: RendleContestDocument['isVisible'];
 	prizePool: RendleContestDocument['prizePool'];
 	contestants: RendleContestDocument['contestants'];
 	gameType: RendleContestDocument['gameType'];
 	entryFee: RendleContestDocument['entryFee']
 };
 
-type gameTypeExpiryStatus = {
-	[key: number]: boolean
-};
+type gameTypeExpiryStatus = { [key: number]: boolean };
 
-type gameTypeStartsOn = {
-	[key: number]: any
-};
+type gameTypeStartsOn = { [key: number]: any };
 
 function getCurrentIndianDateTime() {
 	var time = moment.utc().format()
 	return new Date(time);
 }
-
 
 const gameTypeExpiryStatus: gameTypeExpiryStatus = {
 	5: false,
@@ -42,17 +37,27 @@ const gameTypeExpiryStatus: gameTypeExpiryStatus = {
 
 const gameTypeStartsOn: gameTypeStartsOn = {
 	5: getCurrentIndianDateTime(),
-	6: (getCurrentIndianDateTime().getTime() + 4 * 60 * 60 * 1000),
+	6: new Date((getCurrentIndianDateTime().getTime() + 4 * 60 * 60 * 1000)),
 	7: null
 }
+
+const addTimeToDate = (date: Date, timeInMilliseconds: number): Date => new Date(date.getTime() + timeInMilliseconds)
 
 const createRendleContest = async (gameType: number, entryFee: number, gameTypeId: RendleGameTypeDocument) => {
 	try {
 		logger.info(`>> creating new contest for Rendle ${gameType} with StartsOn ${gameTypeStartsOn[gameType]}`)
+
+		const tenMinutes = 1000 * 60 * 10
+
+		const opensAt = addTimeToDate(gameTypeStartsOn[gameType], tenMinutes);
+		const expiresAt = addTimeToDate(opensAt, tenMinutes)
+
 		const input: RendleContestInput = {
 			entryFee: entryFee,
 			minimumContestants: 1,
 			prizePool: 0,
+			opensAt: opensAt || null,
+			expiresAt: expiresAt || null,
 			startsOn: gameTypeStartsOn[gameType],
 			isExpired: gameTypeExpiryStatus[gameType],
 			isVisible: true,
@@ -85,6 +90,7 @@ const initializeRendleGames = async () => {
 	if (count <= 0) {
 		logger.info(">> creating rendles")
 		rendleGameTypes.map((rendleGameType) => {
+			console.log(rendleGameType)
 			createRendleGameType(rendleGameType);
 		})
 	}

@@ -14,7 +14,7 @@ enum RendleContestState {
 // @access public
 export const enterRendlesContestController = async (req: Request, res: Response) => {
 
-	const { gameType, contestId, userId, request } = req.body
+	const { contestId, userId, request } = req.body
 
 	const isInContest = await doesUserAlreadyInRendleContest(userId, contestId);
 

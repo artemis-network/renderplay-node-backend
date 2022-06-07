@@ -97,3 +97,8 @@ export const doesUserPlayingRendleContest = async (userId: string, contestId: st
 	if (isParticipating) return true
 	return false
 }
+
+export const getRendleExpiryTime = async (contestId: string) => {
+	const contest = await RendleContest.findById(contestId)
+	return { expiresAt: contest?.expiresAt, opensAt: contest?.opensAt }
+}
