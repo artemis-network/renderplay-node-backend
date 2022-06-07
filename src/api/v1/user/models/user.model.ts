@@ -7,7 +7,8 @@ type UserDocument = Document & {
   isGoogleAccount: Boolean,
   isVerified: Boolean,
   isActivated: Boolean,
-  token: String
+  metamaskAddress: string,
+  token: string
 };
 
 const userSchema = new Schema(
@@ -21,6 +22,10 @@ const userSchema = new Schema(
       type: Schema.Types.String,
       required: true,
       unique: true,
+    },
+    metamaskAddress: {
+      type: Schema.Types.String,
+      requried: false,
     },
     password: {
       type: Schema.Types.String,
