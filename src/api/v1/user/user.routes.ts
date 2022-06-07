@@ -9,14 +9,14 @@ import { authorizeUserMiddleWare } from '../middlewares/jwtTokenAuthenticator.mi
 import { getWalletController } from './controllers/wallet.controller';
 import { checkForAccountActivationController, verifyUserEmailController } from './controllers/verification.controller';
 import { createUserController, createGoogleUserController, createMobileGoogleUserController, loginUserController } from './controllers/user.controller'
-import { initUser } from './user.init'
+import { userInitController } from './controllers/user_init.controller'
 
 
 import { depositFundsController } from './controllers/wallet.controller'
 
 import { userPrefix, walletPrefix } from '../config'
 
-router.post(`${userPrefix}/init`, initUser);
+router.post(`${userPrefix}/init`, userInitController);
 router.post(`${userPrefix}/login`, loginUserController);
 router.post(`${userPrefix}/register`, createUserController);
 router.post(`${userPrefix}/google-login`, createGoogleUserController);
