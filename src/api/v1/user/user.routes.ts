@@ -13,7 +13,6 @@ import {
 	createGoogleUserController,
 	createMobileGoogleUserController,
 	loginUserController,
-	setUserWalletAddressController
 } from './controllers/user.controller'
 
 
@@ -28,7 +27,6 @@ router.post(`${userPrefix}/register`, createUserController);
 router.post(`${userPrefix}/google-login`, createGoogleUserController);
 router.post(`${userPrefix}/google-mobile-login`, createMobileGoogleUserController);
 router.get(`${userPrefix}/test-token`, authorizeUserMiddleWare, (req, res) => res.send("hello"));
-router.post(`${userPrefix}/set-wallet-address`, setUserWalletAddressController);
 
 router.post(`${userPrefix}/users/activate-user`, checkForAccountActivationController)
 router.post(`${userPrefix}/users/verify-user`, verifyUserEmailController)

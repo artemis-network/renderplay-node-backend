@@ -1,11 +1,6 @@
-import { db } from '../../db'
+import { db, RendleContestantType } from '../../db'
 
-const { RendleGameType, RendleContest, RendleResult } = db;
-
-export const getRendleGameTypes = async () => {
-	const rendles = await RendleGameType.find().sort({ gameType: 1 });
-	return { rendleGameTypes: rendles }
-}
+const { RendleContest, RendleResult, RendleContestant } = db;
 
 export const getRendleContests = async () => {
 	const rendles: any = await RendleContest.find().where({ isVisible: true }).populate("gameType").sort({ gameType: 1 }).exec();
@@ -15,36 +10,21 @@ export const getRendleContests = async () => {
 		const gameType = rendles[i].gameType?.gameType;
 		const startsOn = rendles[i].startsOn;
 		const entryFee = rendles[i].entryFee
+		const expiresAt = rendles[i].expiresAt
 		serializedRendles.push({
-			_id: id,
-			gameType: gameType,
-			startsOn: startsOn,
-			entryFee: entryFee
+			_id: id, gameType: gameType, startsOn: startsOn, entryFee: entryFee, expiresAt: expiresAt
 		})
 	}
 	return { rendleContests: serializedRendles }
 }
 
-export const getRendleContestants = async (contestId: string) => {
-	const rendleContestants = await RendleContest.findById(contestId)
-	return { rendleContestants: rendleContestants }
-}
-
-export const getRendleParticipants = async (contestId: string) => {
-	const results = await RendleResult.find()
-	const participants: any = [];
-	results.map((result) => {
-		const _id = String(result?.contestId)
-		if (_id === contestId) participants.push(result);
-	})
-	return { rendleParticipants: participants };
-}
-
 export const doesUserAlreadyInRendleContest = async (userId: string, contestId: string) => {
-	const contest = await RendleContest.findById(contestId)
-	const contestants = contest?.contestants;
-	const contestant = contestants?.find((contestant) => String(contestant) === String(userId))
-	if (contestant) return true
+	const contest = await RendleContest.findById(contestId).populate("contestants")
+	const contestants: any = contest?.contestants ?? [];
+	for (let i = 0; i < contestants.length; i++) {
+		const isInContest: boolean = String(contestants[i].user) === String(userId);
+		if (isInContest) return true
+	}
 	return false
 }
 
@@ -53,30 +33,39 @@ export const getRendleContestEntryFee = async (id: number) => {
 	return contest?.entryFee || 0
 }
 
-export const addUserToRendleContest = async (userId: string, contestId: string, entryFee: number) => {
+export const createRendleContestant = async (contestant: RendleContestantType) => await RendleContestant.create(contestant)
+
+export const getRendleContestant = async (userId: string, contestId: string) => await RendleContestant.findOne({
+	contest: contestId
+}).where({ user: userId })
+
+export const addUserToRendleContest = async (userId: string, contestId: string, walletAddress: string, entryFee: number) => {
 	const contest = await RendleContest.findById(contestId);
-	const contestants = contest?.contestants;
-	contestants?.push(userId);
+	const contestant = await createRendleContestant({ user: userId, contest: contestId, walletAddress: walletAddress })
 	await contest?.updateOne({
 		$set: {
-			contestants: contestants,
+			contestants: ([...contest?.contestants, contestant]),
 			prizePool: (contest?.prizePool + entryFee)
 		}
 	})
 	await contest?.save()
 }
 
-export const saveRendleContestResult = async (gameType: number, contestId: string, userId: string,
+export const saveRendleContestResult = async (gameType: number, contestId: string, contestant: string,
 	completedIn: number, chances: number, isWon: boolean, words: any) => {
-	await RendleResult.create({
-		userId: userId, gameType: gameType, chances: chances, completedIn: completedIn,
-		isWon: isWon, completedOn: new Date(), contestId: contestId, rendleWords: words
-	})
+	try {
+		await RendleResult.create({
+			contestant: contestant, gameType: gameType, chances: chances, completedIn: completedIn,
+			isWon: isWon, completedOn: new Date(), contest: contestId, rendleWords: words
+		})
+	} catch (e) {
+		console.log(e)
+	}
 }
 
 export const doesUserFinishedRendleGame = async (userId: string, contestId: string) => {
-	const result = await RendleResult
-		.findOne({ userId: userId }).where({ contestId: contestId }).exec()
+	const contestant = await RendleContestant.findOne({ user: userId }).where({ contest: contestId })
+	const result = await RendleResult.findOne({ contestant: contestant?._id })
 	if (result !== null) {
 		if (result)
 			return {
@@ -84,17 +73,20 @@ export const doesUserFinishedRendleGame = async (userId: string, contestId: stri
 				startsOn: result?.startedOn,
 				completedOn: result?.completedOn,
 				isWon: result.isWon,
-				contestId: result.contestId,
+				contest: result.contest,
 				isGameCompleted: true
 			}
 	} return null
 }
 
 export const doesUserPlayingRendleContest = async (userId: string, contestId: string) => {
-	const contest = await RendleContest.findById(contestId)
-	const contestants = contest?.contestants;
-	const isParticipating = contestants?.find((c) => String(c) === String(userId))
-	if (isParticipating) return true
+	const contest = await RendleContest.findById(contestId).populate("contestants")
+	const contestants: any = contest?.contestants ?? [];
+	for (let i = 0; i < contestants.length; i++) {
+		console.log(contestants, userId)
+		const isPlaying: boolean = String(contestants[i].user) === String(userId);
+		if (isPlaying) return true
+	}
 	return false
 }
 

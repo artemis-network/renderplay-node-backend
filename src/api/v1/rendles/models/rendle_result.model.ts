@@ -1,62 +1,24 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
 
-type RendleResultsDocument = Document & {
-	gameType: number;
-	contestId: string;
-	startedOn: Date,
-	completedOn: Date,
-	chances: number,
-	isWon: Boolean,
-	userId: string;
-};
+export type RendleResultType = {
+	gameType: number; contest: string; startedOn: Date,
+	completedOn: Date, chances: number, isWon: Boolean, contestant: string;
+}
 
-type RendleResultsInput = {
-	gameType: RendleResultsDocument['gameType'];
-	contestId: RendleResultsDocument['contestId'];
-	startedOn: RendleResultsDocument['startedOn'],
-	completedOn: RendleResultsDocument['completedOn'],
-	chances: RendleResultsDocument['chances'],
-	isWon: RendleResultsDocument['isWon'],
-	userId: RendleResultsDocument['userId']
-};
+export type RendleResultsDocument = Document & RendleResultType;
 
-const rendleResultsSchema = new Schema(
-	{
-		gameType: {
-			type: Schema.Types.Number,
-			required: true,
-		},
-		contestId: {
-			type: Schema.Types.ObjectId,
-			ref: 'Rendle_Contest'
-		},
-		completedIn: { type: Schema.Types.Number },
-		completedOn: {
-			type: Schema.Types.Date,
-			required: true,
-		},
-		chances: {
-			type: Schema.Types.Number,
-			required: true,
-		},
-		isWon: {
-			type: Schema.Types.Boolean,
-			required: true,
-		},
-		userId: {
-			type: Schema.Types.ObjectId,
-			ref: 'User'
-		},
-		rendleWords: [
-			{
-				type: Schema.Types.ObjectId,
-				ref: 'Rendle_Word'
-			}
-		]
-	},
+const rendleResultsSchema = new Schema({
+	gameType: { type: Schema.Types.Number, required: true, },
+	contest: { type: Schema.Types.ObjectId, ref: 'Rendle_Contest', required: true },
+	completedIn: { type: Schema.Types.Number, required: true },
+	completedOn: { type: Schema.Types.Date, required: true, },
+	chances: { type: Schema.Types.Number, required: true, },
+	isWon: { type: Schema.Types.Boolean, required: true, },
+	contestant: { type: Schema.Types.ObjectId, ref: 'Rendle_Contestant' },
+	rendleWords: [{ type: Schema.Types.ObjectId, ref: 'Rendle_Word' }]
+},
 );
 
 
-const RendleResult: Model<RendleResultsDocument> = mongoose.model<RendleResultsDocument>('Rendle_Result', rendleResultsSchema);
-
-export { RendleResult, RendleResultsInput, RendleResultsDocument };
+export const RendleResult: Model<RendleResultsDocument> = mongoose
+	.model<RendleResultsDocument>('Rendle_Result', rendleResultsSchema);

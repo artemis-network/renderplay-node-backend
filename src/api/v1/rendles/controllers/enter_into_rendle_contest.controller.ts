@@ -14,7 +14,7 @@ enum RendleContestState {
 // @access public
 export const enterRendlesContestController = async (req: Request, res: Response) => {
 
-	const { contestId, userId, request } = req.body
+	const { contestId, userId, request, walletAddress } = req.body
 
 	const isInContest = await doesUserAlreadyInRendleContest(userId, contestId);
 
@@ -39,9 +39,11 @@ export const enterRendlesContestController = async (req: Request, res: Response)
 	})
 
 	await deductFunds(userId, gameEntryFee)
-	await addUserToRendleContest(userId, contestId, gameEntryFee);
+	await addUserToRendleContest(userId, contestId, walletAddress, gameEntryFee);
 	const gameState = await createGameStateForUser(userId, contestId)
 	return res.status(200).json({
-		message: "ok", error: false, gameStateId: gameState.gameStateId
+		message: "ok",
+		error: false,
+		gameStateId: gameState.gameStateId
 	});
 }

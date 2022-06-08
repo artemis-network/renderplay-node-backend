@@ -26,7 +26,7 @@ type gameTypeStartsOn = { [key: number]: any };
 
 function getCurrentIndianDateTime() {
 	var time = moment.utc().format()
-	return new Date(time);
+	return new Date();
 }
 
 const gameTypeExpiryStatus: gameTypeExpiryStatus = {

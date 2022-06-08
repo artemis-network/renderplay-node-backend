@@ -1,11 +1,11 @@
-import { RendleWordDocument } from './rendle_word.model'
 import mongoose, { Schema, Model, Document } from 'mongoose';
+import { UserType, RendleContestType, RendleWordType } from '../../db'
 
-type RendleGameStateDocument = Document & {
-	userId: string;
-	contestId: string,
-	words: Array<RendleWordDocument>,
-};
+export type RendleGameStateType = {
+	user: string; contest: string, words: string[],
+}
+
+export type RendleGameStateDocument = Document & RendleGameStateType;
 
 const rendleGameStateSchema = new Schema({
 	userId: { type: Schema.Types.String, unique: true },
@@ -13,9 +13,5 @@ const rendleGameStateSchema = new Schema({
 	words: [{ type: Schema.Types.ObjectId, ref: 'Rendle_Word' }],
 });
 
-const RendleGameState: Model<RendleGameStateDocument> = mongoose.model<RendleGameStateDocument>('Rendle_Game_State', rendleGameStateSchema);
-
-export {
-	RendleGameState,
-	RendleGameStateDocument
-};
+export const RendleGameState: Model<RendleGameStateDocument> = mongoose
+	.model<RendleGameStateDocument>('Rendle_Game_State', rendleGameStateSchema);
