@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
-import { renderScanDomainObjects } from '../renderscan.objects'
+import { db } from '../../db'
 
-const { RenderScanGameType } = renderScanDomainObjects;
+const { RenderScanGameType } = db;
 
 export const getRenderScanGameTypesController = async (req: Request, res: Response) => {
 	const renderscanGameTypes = await RenderScanGameType.find()

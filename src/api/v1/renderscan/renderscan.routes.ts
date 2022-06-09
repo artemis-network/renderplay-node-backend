@@ -16,12 +16,8 @@ import { getRenderScanGameTypesController } from './controllers/get_renderscan_g
 import { renderscanPrefix } from '../config'
 
 const fileStorageEngine = multer.diskStorage({
-	destination: (req, file, cb) => {
-		cb(null, './renderscan_images')
-	},
-	filename: (req, file, cb) => {
-		cb(null, new Date().getTime().toString() + file.originalname);
-	}
+	destination: (req, file, cb) => cb(null, './renderscan_images'),
+	filename: (req, file, cb) => cb(null, new Date().getTime().toString() + file.originalname)
 })
 
 const upload = multer({ storage: fileStorageEngine })
@@ -38,7 +34,5 @@ router.post(`${renderscanPrefix}/enter`, enterIntoRenderScanContestController);
 router.post(`${renderscanPrefix}/save`, upload.single("image"), saveRenderScanContestResultController);
 router.post(`${renderscanPrefix}/status`, getRenderScanGameStatusController);
 
-router.post(`${renderscanPrefix}/contestants`, renderScanController.getRenderScanContestantsController);
-router.post(`${renderscanPrefix}/participants`, renderScanController.getRenderScanParticipantsController);
 
 export { router as renderScanRoutes }

@@ -1,11 +1,10 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
 
-interface RenderScanQuizQuestion {
-	question: string, anwser: string,
-	imageUrl: string, opensAt: Date
+interface RenderScanQuizQuestionType {
+	question: string, anwser: string, imageUrl: string, opensAt: Date
 };
 
-interface RenderScanQuizQuestionDoc extends RenderScanQuizQuestion, Document { }
+interface RenderScanQuizQuestionDoc extends RenderScanQuizQuestionType, Document { }
 interface RenderScanQuizQuestionModel extends Model<RenderScanQuizQuestionDoc> { }
 
 const renderScanQuizQuestionSchema = new Schema({

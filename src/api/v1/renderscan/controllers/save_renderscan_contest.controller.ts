@@ -8,5 +8,4 @@ export const saveRenderScanContestResultController = async (req: Request, res: R
 	const { contestId, userId, fileUrl } = req.body;
 	const response = await saveRenderScanContestResult(contestId, userId, fileUrl);
 	return res.status(200).json(response);
-
 }

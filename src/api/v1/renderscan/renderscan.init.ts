@@ -1,8 +1,8 @@
 import path from 'path'
 import tsv from 'csvtojson'
 
-import { renderScanDomainObjects } from './renderscan.objects'
-const { RenderScanQuiz, RenderScanContest, RenderScanGameType, RenderScanQuizQuestion } = renderScanDomainObjects
+import { db } from '../db'
+const { RenderScanQuiz, RenderScanContest, RenderScanGameType, RenderScanQuizQuestion } = db
 
 interface QuizQuestion { question: string; anwser: string; imageUrl: string; opensAt: Date }
 interface RenderScanGameTypeObject { entryFee: number, gameType: string, category: string, filename: string };
@@ -73,8 +73,8 @@ const createRenderScanContests = async () => {
 	const paidGameTypes = await RenderScanGameType.find().where({ gameType: RenderScanGameTypeEnum.PAID });
 	const hour = (1000 * 60 * 60)
 
-	let freeGameTypeTimeInterval: number = 1;
-	let paidGameTypeTimeInterval: number = 2;
+	let freeGameTypeTimeInterval: number = 0;
+	let paidGameTypeTimeInterval: number = 1;
 
 	for (let i = 0; i < freeGameTypes.length; i++) {
 		const now = new Date().getTime();
@@ -92,6 +92,9 @@ const createRenderScanContests = async () => {
 	for (let i = 0; i < paidGameTypes.length; i++) {
 		const now = new Date().getTime();
 		const contestTime: Date = new Date(now + (paidGameTypeTimeInterval * hour))
+
+		console.log(paidGameTypes[i])
+
 		await createRenderScanContest({
 			gameType: paidGameTypes[i]._id,
 			startsOn: contestTime,

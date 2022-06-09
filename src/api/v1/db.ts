@@ -14,6 +14,13 @@ import { RendleGameType, RendleGameTypeDocument, RendleGameTypeType } from './re
 import { RendleGameState, RendleGameStateDocument, RendleGameStateType } from './rendles/models/rendle_game_state.model'
 import { RendleContestant, RendleContestantDocument, RendleContestantType, } from './rendles/models/rendle_contestant.model'
 
+import { RenderScan, RenderScanDoc } from './renderscan/models/renderscan.model'
+import { RenderScanQuiz, RenderScanQuizDoc } from './renderscan/models/renderscan_quiz.model'
+import { RenderScanResults, RenderScanResultDoc } from './renderscan/models/renderscan_results.model'
+import { RenderScanContest, RenderScanContestDoc } from './renderscan/models/renderscan_contest.model'
+import { RenderScanGameType, RenderScanGameTypeDoc } from './renderscan/models/renderscan_game_type.modal'
+import { RenderScanQuizQuestion, RenderScanQuizQuestionDoc } from './renderscan/models/renderscan_quiz_question.model'
+import { RenderScanContestant, RenderScanContestantDoc, RenderScanContestantType } from './renderscan/models/renderscan_contestant.model'
 
 import { MONGO_DB_URL } from '../../config'
 
@@ -39,6 +46,9 @@ export const db = {
 	RendleWord, RendleResult, RendleContest, RendleGameType, RendleGameState,
 	RendleContestant,
 
+	// Renderscan Models
+	RenderScan, RenderScanQuiz, RenderScanContest, RenderScanResults,
+	RenderScanGameType, RenderScanQuizQuestion, RenderScanContestant
 }
 
 export {
@@ -47,7 +57,10 @@ export {
 
 	// Rendle Types
 	RendleWordType, RendleResultType, RendleContestType, RendleGameTypeType,
-	RendleContestantType, RendleGameStateType
+	RendleContestantType, RendleGameStateType,
+
+	// Renderscan Types
+	RenderScanContestantType
 }
 
 export {
@@ -59,5 +72,9 @@ export {
 
 	// Rendle Docs
 	RendleResultsDocument, RendleContestDocument, RendleGameTypeDocument,
-	RendleGameStateDocument, RendleWordDocument, RendleContestantDocument
+	RendleGameStateDocument, RendleWordDocument, RendleContestantDocument,
+
+	// Renderscan Docs 
+	RenderScanDoc, RenderScanQuizDoc, RenderScanResultDoc, RenderScanContestDoc,
+	RenderScanGameTypeDoc, RenderScanQuizQuestionDoc, RenderScanContestantDoc
 }

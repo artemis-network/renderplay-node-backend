@@ -1,8 +1,8 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
 import { UserDocument } from '../../user/models/user.model'
 
-interface RenderScan { fileUrl: string; user: UserDocument }
-interface RenderScanDoc extends RenderScan, Document { };
+interface RenderScanType { fileUrl: string; user: UserDocument }
+interface RenderScanDoc extends RenderScanType, Document { };
 interface RenderScanModel extends Model<RenderScanDoc> { }
 
 const renderScanSchema = new Schema({

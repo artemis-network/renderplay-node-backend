@@ -1,13 +1,8 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
 
-interface RenderScanGameType {
-	gameType: string;
-	category: string;
-	entryFee: number;
-	filename: string
-}
+interface RenderScanGameTypeType { gameType: string; category: string; entryFee: number; filename: string }
 
-interface RenderScanGameTypeDoc extends RenderScanGameType, Document { };
+interface RenderScanGameTypeDoc extends RenderScanGameTypeType, Document { };
 interface RenderScanGameTypeModel extends Model<RenderScanGameTypeDoc> { };
 
 const renderScanGameTypeSchema = new Schema({

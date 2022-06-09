@@ -1,12 +1,22 @@
 import { Request, Response } from 'express'
-import { RenderScanContest } from '../models/renderscan_contests.model'
+import { RenderScanContest } from '../models/renderscan_contest.model'
 
 // @desc getting renderscans
 // @api /backend/v1/renderscan
 // @access public
 export const getRenderScanContestsController = async (req: Request, res: Response) => {
-	console.log(">> logging renderscans")
-	const renderscans = await RenderScanContest.find().populate('gameType').exec()
+	const renderscans: any = await RenderScanContest.find().populate('gameType').exec()
 	console.log(renderscans)
-	return res.status(200).json({ renderscanContest: renderscans })
+	const modRenderscanList = [];
+	for (let i = 0; i < renderscans.length; i++) {
+		const response = {
+			_id: renderscans[i]._id,
+			startsOn: renderscans[i].startsOn,
+			entryFee: renderscans[i].entryFee,
+			gameType: renderscans[i].gameType.gameType,
+			category: renderscans[i].gameType.category,
+		}
+		modRenderscanList.push(response)
+	}
+	return res.status(200).json({ renderscanContests: modRenderscanList })
 }

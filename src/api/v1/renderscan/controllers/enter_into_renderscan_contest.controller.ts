@@ -15,7 +15,9 @@ enum RenderScanContestState {
 // @route /backend/v1/renderscans/enter
 // @access public
 export const enterIntoRenderScanContestController = async (req: Request, res: Response) => {
-	const { userId, contestId, request } = req.body;
+	const { userId, contestId, request, walletAddress } = req.body;
+	console.log(req.body)
+
 	const isInContest = await doesUserAlreadyInRenderScanContest(contestId, userId);
 	if (isInContest) {
 		return res.status(200).json({
@@ -35,7 +37,7 @@ export const enterIntoRenderScanContestController = async (req: Request, res: Re
 	})
 
 	await deductFunds(userId, gameEntryFee)
-	await addUserToRenderScanContest(contestId, userId, gameEntryFee);
+	await addUserToRenderScanContest(contestId, userId, gameEntryFee, walletAddress);
 	return res.status(200).json({
 		message: "paid", status: RenderScanContestState.PAID,
 	});
