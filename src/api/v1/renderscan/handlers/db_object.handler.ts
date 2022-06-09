@@ -1,11 +1,11 @@
 import { ExceptionHandler } from '../../exceptions/db.exceptions'
-import { renderScanDomainObjects, } from '../renderscan.objects'
+import { db } from '../../db'
 
 const {
 	RenderScan,
 	RenderScanQuiz, RenderScanResults, RenderScanContest,
 	RenderScanGameType, RenderScanQuizQuestion
-} = renderScanDomainObjects
+} = db
 
 
 
