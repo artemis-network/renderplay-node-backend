@@ -2,7 +2,7 @@ import path from 'path'
 import tsv from 'csvtojson'
 
 import { db } from '../db'
-const { RenderScanQuiz, RenderScanContest, RenderScanGameType, RenderScanQuizQuestion } = db
+const { RenderScanQuiz, RenderScanContest, RenderScanGameType, RenderScanQuizQuestion, RenderScanContestTypeState } = db
 
 interface QuizQuestion { question: string; anwser: string; imageUrl: string; opensAt: Date }
 interface RenderScanGameTypeObject { entryFee: number, gameType: string, category: string, filename: string };
@@ -61,7 +61,7 @@ const createRenderScanContest = async (renderScanObject: RenderScanContest, game
 		minimumContestants: renderScanObject.mininumContestants,
 		contestants: renderScanObject.contestants,
 	})
-	const lobbyExpiresAt: Date = new Date(new Date(renderScanObject.startsOn).getTime() + (1000 * 60 * 10));
+	const lobbyExpiresAt: Date = new Date(new Date(renderScanObject.startsOn).getTime() + (1000 * 60 * 1));
 	const questionsFromTsv = await readTsvQuizQuestionsFile(gameType, filename);
 	const questions = await createQuizQuestionsForRenderScanContest(questionsFromTsv, lobbyExpiresAt);
 	const quiz = await RenderScanQuiz.create({ contest: renderscan?._id, questions: questions, lobbyExpiresAt: lobbyExpiresAt })
@@ -69,57 +69,70 @@ const createRenderScanContest = async (renderScanObject: RenderScanContest, game
 }
 
 const createRenderScanContests = async () => {
-	const freeGameTypes = await RenderScanGameType.find().where({ gameType: RenderScanGameTypeEnum.FREE });
-	const paidGameTypes = await RenderScanGameType.find().where({ gameType: RenderScanGameTypeEnum.PAID });
+
+	const gameTypesState = ["[FREE]", "[PAID]", "[PAID]"]
+	const categoryState = ["[SPORTS]", "[GEOGRAPHY]", "[CELEBRITY]", "[GENERAL]", "[ANIMALS]"]
+
 	const hour = (1000 * 60 * 60)
+	let timeInterval = 0
 
-	let freeGameTypeTimeInterval: number = 0;
-	let paidGameTypeTimeInterval: number = 1;
-
-	for (let i = 0; i < freeGameTypes.length; i++) {
+	for (let i = 0; i < gameTypesState.length; i++) {
 		const now = new Date().getTime();
-		const contestTime: Date = new Date(now + (freeGameTypeTimeInterval * hour))
+		const contestTime: Date = new Date(now + (timeInterval * hour))
+		console.log(gameTypesState[i], categoryState[i])
+		const game: any = await RenderScanGameType.findOne({ gameType: gameTypesState[i] }).where({ category: categoryState[i] })
+		console.log(game)
+
 		await createRenderScanContest({
-			gameType: freeGameTypes[i]._id,
+			gameType: game?._id,
 			startsOn: contestTime,
-			entryFee: freeGameTypes[i].entryFee,
+			entryFee: game?.entryFee,
 			mininumContestants: 0, prizePool: 0, contestants: [], quiz: ""
-		}, freeGameTypes[i].gameType, freeGameTypes[i].filename)
+		}, game?.gameType, game?.filename)
 
-		freeGameTypeTimeInterval += 2
+		timeInterval += 2
 	}
 
-	for (let i = 0; i < paidGameTypes.length; i++) {
-		const now = new Date().getTime();
-		const contestTime: Date = new Date(now + (paidGameTypeTimeInterval * hour))
-
-		console.log(paidGameTypes[i])
-
-		await createRenderScanContest({
-			gameType: paidGameTypes[i]._id,
-			startsOn: contestTime,
-			entryFee: paidGameTypes[i].entryFee,
-			mininumContestants: 0,
-			prizePool: 0,
-			contestants: [],
-			quiz: ""
-		}, paidGameTypes[i].gameType, paidGameTypes[i].filename)
-
-		paidGameTypeTimeInterval += 2;
-	}
+	await RenderScanContestTypeState.create({ gameTypeCounter: 2, categoryTypeCounter: 2 })
 }
 
-export const renderScanResetOneByContesyId = async (gameType: string, filename: string) => {
+export const renderScanResetOneByContesyId = async () => {
+
+	const state: any = await RenderScanContestTypeState.findOne()
+	const gameTypesState = ["[FREE]", "[PAID]", "[PAID]"]
+	const categoryState = ["[SPORTS]", "[GEOGRAPHY]", "[CELEBRITY]", "[GENERAL]", "[ANIMALS]"]
+
+	let gameTypeCounter = state?.gameTypeCounter + 1
+	let categoryTypeCounter = state?.categoryTypeCounter + 1
+
+	if (gameTypeCounter >= 3) gameTypeCounter = 0
+	if (categoryTypeCounter >= 5) categoryTypeCounter = 0
+
+
+	const gameType: any = await RenderScanGameType
+		.findOne({ gameType: gameTypesState[gameTypeCounter] })
+		.where({ category: categoryState[categoryTypeCounter] })
+
+
+	const time = new Date().getTime() + (1000 * 60 * 60 * 4)
 	const renderscan = await RenderScanContest.create({
-		gameType: gameType,
+		gameType: gameType?._id,
+		entryFee: gameType?.entryFee,
 		prizePool: 0,
-		startsOn: new Date(),
+		startsOn: new Date(time),
 		minimumContestants: 50,
 		contestants: []
 	})
 	const lobbyExpiresAt: Date = new Date(new Date().getTime() + (1000 * 60 * 10));
-	const questionsFromTsv = await readTsvQuizQuestionsFile(gameType, filename);
+	console.log(lobbyExpiresAt)
+	const questionsFromTsv = await readTsvQuizQuestionsFile(gameType.gameType, gameType.filename);
+	console.log(questionsFromTsv)
 	const questions = await createQuizQuestionsForRenderScanContest(questionsFromTsv, lobbyExpiresAt);
+	console.log(questions)
 	const quiz = await RenderScanQuiz.create({ contest: renderscan?._id, questions: questions, lobbyExpiresAt: lobbyExpiresAt })
+	console.log(quiz)
 	await renderscan?.updateOne({ $set: { quiz: quiz?._id } })
+	await RenderScanContestTypeState.findOne().updateOne({
+		gameTypeCounter: gameTypeCounter, categoryTypeCounter: categoryTypeCounter
+	})
 } 

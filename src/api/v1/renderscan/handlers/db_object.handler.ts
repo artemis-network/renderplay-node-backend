@@ -8,7 +8,6 @@ const {
 } = db
 
 
-
 export class RenderScanDocumentFactory {
 	static get(renderScanDocs: string) {
 		if (renderScanDocs === "renderscan") {

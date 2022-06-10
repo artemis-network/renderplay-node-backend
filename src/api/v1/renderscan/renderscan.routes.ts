@@ -28,7 +28,7 @@ router.get(`${renderscanPrefix}`, getRenderScanContestsController);
 router.get(`${renderscanPrefix}/types`, getRenderScanGameTypesController);
 
 router.post(`${renderscanPrefix}/init`, createRenderScanContestQuizQuestionsControllers)
-router.post(`${renderscanPrefix}/init-one`, createRenderScanContestQuizQuestionsOneControllers)
+router.post(`${renderscanPrefix}/reset`, createRenderScanContestQuizQuestionsOneControllers)
 router.post(`${renderscanPrefix}/questions`, getRenderScanQuestionController)
 router.post(`${renderscanPrefix}/enter`, enterIntoRenderScanContestController);
 router.post(`${renderscanPrefix}/save`, upload.single("image"), saveRenderScanContestResultController);

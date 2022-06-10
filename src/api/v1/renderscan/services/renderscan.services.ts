@@ -1,6 +1,7 @@
 import { db } from "../../db"
+import { RenderScanQuiz } from "../models/renderscan_quiz.model";
 
-const { RenderScan, RenderScanContest, RenderScanGameType, RenderScanResults, RenderScanContestant } = db
+const { RenderScan, RenderScanContest, RenderScanGameType, RenderScanResults, RenderScanContestant, RenderScanContestTypeState } = db
 
 export const getRenderScanContestants = async () => {
 	const renderScanTypes = await RenderScanContest.find().populate("contestants").exec();
@@ -65,4 +66,39 @@ export const doesUserStillPlayingRenderScanContest = async (contestId: string, u
 	for (let i = 0; i < contestants.length; i++)
 		if (String(contestants[i].user) === String(userId)) return true
 	return false
+}
+
+export const getRenderScanTypeState = async () => {
+	const state = await RenderScanContestTypeState.findOne()
+	return {
+		gameTypeCounter: state?.gameTypeCounter,
+		categoryTypeCounter: state?.categoryTypeCounter
+	}
+}
+
+export const updateRenderScanTypeState = async () => {
+	const state = await RenderScanContestTypeState.findOne()
+	await state?.updateOne({
+		gameTypeCounter: (state?.gameTypeCounter + 1),
+		categoryTypeCounter: (state?.categoryTypeCounter + 1)
+	})
+	await state?.save()
+}
+
+export const getRenderScanContests = async () => await RenderScanContest.find()
+	.sort({ startsOn: -1 })
+	.limit(3)
+	.populate('gameType').exec()
+
+export const getRenderScanGameTypes = async (gameType: string, categoryType: string) =>
+	await RenderScanGameType.findOne({ gameType: gameType }).where({ category: categoryType })
+
+
+export const getRenderScanContestIsLobbyClosed = async (startsOn: Date) => {
+	const lobbyCloses = new Date(new Date(startsOn).getTime() + (1000 * 60 * 1)).getTime();
+	const now = new Date().getTime()
+	const status = now - lobbyCloses
+	console.log(status)
+	if (status <= 0) return false
+	return true
 }
