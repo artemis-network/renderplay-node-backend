@@ -22,6 +22,7 @@ import { RenderScanGameType, RenderScanGameTypeDoc } from './renderscan/models/r
 import { RenderScanQuizQuestion, RenderScanQuizQuestionDoc } from './renderscan/models/renderscan_quiz_question.model'
 import { RenderScanContestant, RenderScanContestantDoc, RenderScanContestantType } from './renderscan/models/renderscan_contestant.model'
 import { RenderScanContestTypeState, RenderScanContestTypeStateDoc, RenderScanContestTypeStateType } from './renderscan/models/renderscan_contest_type_state.model'
+import { RenderScanGameState, RenderScanGameStateDoc, RenderScanGameStateType } from './renderscan/models/renderscan_game_state.model'
 
 import { MONGO_DB_URL } from '../../config'
 
@@ -50,7 +51,7 @@ export const db = {
 	// Renderscan Models
 	RenderScan, RenderScanQuiz, RenderScanContest, RenderScanResults,
 	RenderScanGameType, RenderScanQuizQuestion, RenderScanContestant,
-	RenderScanContestTypeState,
+	RenderScanContestTypeState, RenderScanGameState
 }
 
 export {
@@ -62,7 +63,8 @@ export {
 	RendleContestantType, RendleGameStateType,
 
 	// Renderscan Types
-	RenderScanContestantType, RenderScanContestTypeStateType
+	RenderScanContestantType, RenderScanContestTypeStateType,
+	RenderScanGameStateType
 }
 
 export {
@@ -79,5 +81,5 @@ export {
 	// Renderscan Docs 
 	RenderScanDoc, RenderScanQuizDoc, RenderScanResultDoc, RenderScanContestDoc,
 	RenderScanGameTypeDoc, RenderScanQuizQuestionDoc, RenderScanContestantDoc,
-	RenderScanContestTypeStateDoc
+	RenderScanContestTypeStateDoc, RenderScanGameStateDoc
 }

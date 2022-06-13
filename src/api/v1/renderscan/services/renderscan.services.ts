@@ -1,11 +1,9 @@
 import { db } from "../../db"
-import { RenderScanQuiz } from "../models/renderscan_quiz.model";
 
 const { RenderScan, RenderScanContest, RenderScanGameType, RenderScanResults, RenderScanContestant, RenderScanContestTypeState } = db
 
 export const getRenderScanContestants = async () => {
 	const renderScanTypes = await RenderScanContest.find().populate("contestants").exec();
-	console.log(renderScanTypes)
 	return { renderScanTypes: renderScanTypes }
 }
 
@@ -48,20 +46,15 @@ export const saveRenderScanContestResult = async (contestId: string, userId: str
 }
 
 export const doesUserFinishedRenderScanGame = async (userId: string, contestId: string) => {
-	console.log(userId, contestId)
 	const contestant = await RenderScanContestant.findOne({ user: userId }).where({ contest: contestId })
 	const result = await RenderScanResults.findById(contestant?._id)
-	console.log(result)
 	if (result !== null) return true
 	return false
 }
 
 export const doesUserStillPlayingRenderScanContest = async (contestId: string, userId: string) => {
-	console.log(userId, contestId)
 	const contestant = await RenderScanContestant.findOne({ user: userId }).where({ contest: contestId })
-	console.log(contestant)
 	const contest: any = await RenderScanContest.findById(contestant?.contest)
-	console.log(contest)
 	const contestants = contest?.contestants;
 	for (let i = 0; i < contestants.length; i++)
 		if (String(contestants[i].user) === String(userId)) return true
@@ -98,7 +91,6 @@ export const getRenderScanContestIsLobbyClosed = async (startsOn: Date) => {
 	const lobbyCloses = new Date(new Date(startsOn).getTime() + (1000 * 60 * 1)).getTime();
 	const now = new Date().getTime()
 	const status = now - lobbyCloses
-	console.log(status)
 	if (status <= 0) return false
 	return true
 }

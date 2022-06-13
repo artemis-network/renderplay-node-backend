@@ -4,6 +4,8 @@ import {
 	getRenderscanGameTypeFee, addUserToRenderScanContest, doesUserAlreadyInRenderScanContest,
 } from '../services/renderscan.services'
 
+import { createRenderscanGameStateForUser, getFirstQuestionOpensAt } from '../services/renderscan_quiz.services'
+
 import { deductFunds, getBalance } from '../../user/services/wallet.service'
 
 enum RenderScanContestState {
@@ -16,7 +18,6 @@ enum RenderScanContestState {
 // @access public
 export const enterIntoRenderScanContestController = async (req: Request, res: Response) => {
 	const { userId, contestId, request, walletAddress } = req.body;
-	console.log(req.body)
 
 	const isInContest = await doesUserAlreadyInRenderScanContest(contestId, userId);
 	if (isInContest) {
@@ -38,6 +39,8 @@ export const enterIntoRenderScanContestController = async (req: Request, res: Re
 
 	await deductFunds(userId, gameEntryFee)
 	await addUserToRenderScanContest(contestId, userId, gameEntryFee, walletAddress);
+	const firstQuestionOpensAt: any = await getFirstQuestionOpensAt(contestId);
+	await createRenderscanGameStateForUser(userId, contestId, firstQuestionOpensAt)
 	return res.status(200).json({
 		message: "paid", status: RenderScanContestState.PAID,
 	});
