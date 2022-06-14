@@ -1,25 +1,26 @@
 import { Request, Response } from 'express';
-import { getRendlesByIsVisible, setRendleIsVisibleAndIsExpiredToFalse, createRendleContest, dropRendGameState } from '../services/rendle_reset.services'
+import { RendleResetServices } from '../services/rendle_reset.services'
 
 // @desc reset all rendle contests
 // @route /backend/v1/rendles/reset
 // @access private
+const addTime = (time: Date, timeInMilliseconds: number) =>
+	new Date(new Date(time).getTime() + timeInMilliseconds)
 
-const addTime = (time: Date, timeInMilliseconds: number) => new Date(new Date(time).getTime() + timeInMilliseconds)
 const fiveMinutes = (1000 * 60 * 5)
 
-export const resetRendlesGameTypesController = async (req: Request, res: Response) => {
+export const resetRendleContests = async (req: Request, res: Response) => {
 	if (req.body.password === "password@1234") {
 
-		await dropRendGameState()
+		await RendleResetServices.resetRendlesGameState()
 
-		const rendles: any = await getRendlesByIsVisible(true);
+		const rendles: any = await RendleResetServices.getRendlesByIsVisible(true);
 
 		rendles.map(async (rendle: any, index: number) => {
 			if (rendle.isExpired === true) {
 				if (index === rendles.length - 1) {
 					//* first game expires
-					await createRendleContest({
+					await RendleResetServices.createRendleContest({
 						gameTypeId: rendles[0].gameType._id,
 						isExpired: true,
 						gameType: rendles[0].gameType.gameType,
@@ -27,9 +28,9 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 						opensAt: null,
 						expiresAt: null
 					})
-					setRendleIsVisibleAndIsExpiredToFalse(rendles[0])
+					RendleResetServices.setRendleIsVisibleAndIsExpiredToFalse(rendles[0])
 					//* second game goes live
-					await createRendleContest({
+					await RendleResetServices.createRendleContest({
 						gameTypeId: rendles[index - 1].gameType._id,
 						isExpired: false,
 						gameType: rendles[index - 1].gameType.gameType,
@@ -37,10 +38,10 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 						opensAt: addTime(new Date(), fiveMinutes),
 						expiresAt: addTime(new Date(), fiveMinutes * 2),
 					})
-					setRendleIsVisibleAndIsExpiredToFalse(rendles[index - 1])
+					RendleResetServices.setRendleIsVisibleAndIsExpiredToFalse(rendles[index - 1])
 				} else if (index == 0) {
 					//* expire the next game
-					await createRendleContest({
+					await RendleResetServices.createRendleContest({
 						gameTypeId: rendles[index + 1].gameType._id,
 						isExpired: true,
 						gameType: rendles[index + 1].gameType.gameType,
@@ -48,9 +49,9 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 						opensAt: null,
 						expiresAt: null
 					})
-					setRendleIsVisibleAndIsExpiredToFalse(rendles[index + 1])
+					RendleResetServices.setRendleIsVisibleAndIsExpiredToFalse(rendles[index + 1])
 					//* live the last game
-					await createRendleContest({
+					await RendleResetServices.createRendleContest({
 						gameTypeId: rendles[index + 2].gameType._id,
 						isExpired: false,
 						gameType: rendles[index + 2].gameType.gameType,
@@ -58,10 +59,10 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 						opensAt: addTime(new Date(), fiveMinutes),
 						expiresAt: addTime(new Date(), fiveMinutes * 2),
 					})
-					setRendleIsVisibleAndIsExpiredToFalse(rendles[index + 2])
+					RendleResetServices.setRendleIsVisibleAndIsExpiredToFalse(rendles[index + 2])
 				} else {
 					// expiring next game
-					await createRendleContest({
+					await RendleResetServices.createRendleContest({
 						gameTypeId: rendles[index + 1].gameType._id,
 						isExpired: true,
 						startsOn: null,
@@ -69,9 +70,9 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 						expiresAt: null,
 						gameType: rendles[index + 1].gameType.gameType,
 					})
-					setRendleIsVisibleAndIsExpiredToFalse(rendles[index + 1])
+					RendleResetServices.setRendleIsVisibleAndIsExpiredToFalse(rendles[index + 1])
 					// live first game
-					await createRendleContest({
+					await RendleResetServices.createRendleContest({
 						gameTypeId: rendles[0].gameType._id,
 						isExpired: false,
 						startsOn: new Date(),
@@ -79,7 +80,7 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 						opensAt: addTime(new Date(), fiveMinutes),
 						expiresAt: addTime(new Date(), fiveMinutes * 2),
 					})
-					setRendleIsVisibleAndIsExpiredToFalse(rendles[0])
+					RendleResetServices.setRendleIsVisibleAndIsExpiredToFalse(rendles[0])
 				}
 
 				const now = new Date(new Date())
@@ -88,7 +89,7 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 				let newTime: any = new Date(now.getTime() + fourHours).toUTCString()
 				newTime = new Date(newTime)
 
-				await createRendleContest({
+				await RendleResetServices.createRendleContest({
 					gameTypeId: rendles[index].gameType._id,
 					isExpired: false,
 					startsOn: newTime,
@@ -96,7 +97,7 @@ export const resetRendlesGameTypesController = async (req: Request, res: Respons
 					expiresAt: addTime(newTime, fiveMinutes * 2),
 					gameType: rendles[index].gameType.gameType,
 				})
-				setRendleIsVisibleAndIsExpiredToFalse(rendles[index])
+				RendleResetServices.setRendleIsVisibleAndIsExpiredToFalse(rendles[index])
 			}
 		})
 

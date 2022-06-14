@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { createRenderScanGameType, renderScanResetOneByContesyId } from '../renderscan.init'
+import { createRenderScanGameType, renderScanResetOneByContesyId, dropRenderscan } from '../renderscan.init'
 
 // @desc set question for renderscan game
 // @route /backend/v1/renderscans/init
@@ -14,5 +14,11 @@ export const createRenderScanContestQuizQuestionsControllers = async (req: Reque
 // @access private
 export const createRenderScanContestQuizQuestionsOneControllers = async (req: Request, res: Response) => {
 	await renderScanResetOneByContesyId()
+	return res.status(200).json({ message: "ok" })
+}
+
+
+export const destroyRenderScan = async (req: Request, res: Response) => {
+	await dropRenderscan()
 	return res.status(200).json({ message: "ok" })
 }

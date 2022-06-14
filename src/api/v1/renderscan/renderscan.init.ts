@@ -2,7 +2,13 @@ import path from 'path'
 import tsv from 'csvtojson'
 
 import { db } from '../db'
-const { RenderScanQuiz, RenderScanContest, RenderScanGameType, RenderScanQuizQuestion, RenderScanContestTypeState } = db
+const { RenderScanQuiz, RenderScanContest, RenderScanGameType, RenderScanQuizQuestion,
+	RenderScanContestTypeState, RenderScan, RenderScanContestant, RenderScanGameState,
+	RenderScanResults
+} = db
+
+const gameTypesState = ["[FREE]", "[PAID]", "[PAID]"]
+const categoryState = ["[SPORTS]", "[GEOGRAPHY]", "[GENERAL]", "[ANIMALS]", "[CELEBRITY]"]
 
 interface QuizQuestion { question: string; anwser: string; imageUrl: string; opensAt: Date }
 interface RenderScanGameTypeObject { entryFee: number, gameType: string, category: string, filename: string };
@@ -70,9 +76,6 @@ const createRenderScanContest = async (renderScanObject: RenderScanContest, game
 
 const createRenderScanContests = async () => {
 
-	const gameTypesState = ["[FREE]", "[PAID]", "[PAID]"]
-	const categoryState = ["[SPORTS]", "[GEOGRAPHY]", "[CELEBRITY]", "[GENERAL]", "[ANIMALS]"]
-
 	const hour = (1000 * 60 * 60)
 	let timeInterval = 0
 
@@ -99,8 +102,6 @@ const createRenderScanContests = async () => {
 export const renderScanResetOneByContesyId = async () => {
 
 	const state: any = await RenderScanContestTypeState.findOne()
-	const gameTypesState = ["[FREE]", "[PAID]", "[PAID]"]
-	const categoryState = ["[SPORTS]", "[GEOGRAPHY]", "[CELEBRITY]", "[GENERAL]", "[ANIMALS]"]
 
 	let gameTypeCounter = state?.gameTypeCounter + 1
 	let categoryTypeCounter = state?.categoryTypeCounter + 1
@@ -135,4 +136,18 @@ export const renderScanResetOneByContesyId = async () => {
 	await RenderScanContestTypeState.findOne().updateOne({
 		gameTypeCounter: gameTypeCounter, categoryTypeCounter: categoryTypeCounter
 	})
-} 
+}
+
+export const dropRenderscan = async () => {
+	await RenderScanQuiz.collection.drop();
+	await RenderScanContest.collection.drop()
+	await RenderScanGameType.collection.drop()
+	await RenderScanQuizQuestion.collection.drop()
+	await RenderScanContestTypeState.collection.drop()
+	await RenderScan.collection.drop()
+	await RenderScanContestant.collection.drop()
+	await RenderScanContest.collection.drop()
+	await RenderScanGameState.collection.drop()
+	await RenderScanResults.collection.drop()
+
+}

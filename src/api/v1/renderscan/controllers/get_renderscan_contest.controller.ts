@@ -7,7 +7,7 @@ import { getRenderScanTypeState, getRenderScanContests, getRenderScanGameTypes, 
 export const getRenderScanContestsController = async (req: Request, res: Response) => {
 	const renderscans: any = await getRenderScanContests()
 	const gameTypesState = ["[FREE]", "[PAID]", "[PAID]"]
-	const categoryState = ["[SPORTS]", "[GEOGRAPHY]", "[CELEBRITY]", "[GENERAL]", "[ANIMALS]"]
+	const categoryState = ["[SPORTS]", "[GEOGRAPHY]", "[GENERAL]", "[ANIMALS]", "[CELEBRITY]"]
 
 	const modRenderscanList = [];
 	for (let i = 0; i < renderscans.length; i++) {

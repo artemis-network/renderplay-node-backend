@@ -3,7 +3,16 @@ import { db, RendleGameTypeDocument, RendleContestDocument } from '../db'
 import { logger } from '../utils/logger'
 import moment from 'moment'
 
-const { RendleGameType, RendleContest } = db
+const { RendleGameType, RendleContest, RendleContestant, RendleGameState, RendleResult, RendleWord } = db
+
+export const dropRendle = async () => {
+	await RendleGameType.collection.drop()
+	await RendleContest.collection.drop()
+	await RendleContestant.collection.drop()
+	await RendleGameState.collection.drop()
+	await RendleResult.collection.drop()
+	await RendleWord.collection.drop()
+}
 
 type RendleGameTypeInput = { gameType: RendleGameTypeDocument['gameType']; };
 
