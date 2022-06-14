@@ -45,7 +45,7 @@ export class RendleResetServices {
 			$set:{
 				startsOn: new Date(),
 				opensAt: addTime(new Date(), fiveMinutes),
-				expiresAt: addTime(new Date(), fiveMinutes)
+				expiresAt: addTime(new Date(), fiveMinutes * 3)
 			}
 		}); await rendle?.save();
 	}
