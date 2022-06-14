@@ -21,7 +21,7 @@ export class RendleContestServices {
 				expiresAt: expiresAt
 			})
 		}
-		return { rendleContests: serializedRendles }
+		return { currentTime: new Date(), rendleContests: serializedRendles }
 	}
 
 	static doesUserAlreadyInContest = async (userId: string, contestId: string) => {
@@ -118,7 +118,6 @@ export class RendleContestServices {
 
 	static getExpiryTime = async (contestId: string) => {
 		const contest = await RendleContest.findById(contestId)
-		console.log(contest)
 		return { expiresAt: contest?.expiresAt, opensAt: contest?.opensAt }
 	}
 }
