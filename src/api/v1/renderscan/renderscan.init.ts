@@ -139,15 +139,38 @@ export const renderScanResetOneByContesyId = async () => {
 }
 
 export const dropRenderscan = async () => {
-	await RenderScanQuiz.collection.drop();
-	await RenderScanContest.collection.drop()
-	await RenderScanGameType.collection.drop()
-	await RenderScanQuizQuestion.collection.drop()
-	await RenderScanContestTypeState.collection.drop()
-	await RenderScan.collection.drop()
-	await RenderScanContestant.collection.drop()
-	await RenderScanContest.collection.drop()
-	await RenderScanGameState.collection.drop()
-	await RenderScanResults.collection.drop()
+
+	if (await RenderScanQuiz.count() > 0)
+		await RenderScanQuiz.collection.drop();
+
+	if (await RenderScanContest.count() > 0)
+		await RenderScanContest.collection.drop()
+
+	if (await RenderScanContest.count() > 0)
+		await RenderScanContest.collection.drop()
+
+	if (await RenderScanGameType.count() > 0)
+		await RenderScanGameType.collection.drop()
+
+	if (await RenderScanQuizQuestion.count() > 0)
+		await RenderScanQuizQuestion.collection.drop()
+
+	if (await RenderScanContestTypeState.count() > 0)
+		await RenderScanContestTypeState.collection.drop()
+
+	if (await RenderScan.count() > 0)
+		await RenderScan.collection.drop()
+
+	if (await RenderScanContestant.count() > 0)
+		await RenderScanContestant.collection.drop()
+
+	if (await RenderScanContest.count() > 0)
+		await RenderScanContest.collection.drop()
+
+	if (await RenderScanGameState.count() > 0)
+		await RenderScanGameState.collection.drop()
+
+	if (await RenderScanResults.count() > 0)
+		await RenderScanResults.collection.drop()
 
 }
