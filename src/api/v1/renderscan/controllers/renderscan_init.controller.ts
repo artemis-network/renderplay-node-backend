@@ -4,7 +4,7 @@ import { createRenderScanGameType, renderScanResetOneByContesyId, dropRenderscan
 // @desc set question for renderscan game
 // @route /backend/v1/renderscans/init
 // @access private
-export const createRenderScanContestQuizQuestionsControllers = async (req: Request, res: Response) => {
+export const createRenderScanContests = async (req: Request, res: Response) => {
 	await createRenderScanGameType()
 	return res.status(200).json({ message: "ok" })
 }
@@ -12,7 +12,7 @@ export const createRenderScanContestQuizQuestionsControllers = async (req: Reque
 // @desc set question for renderscan game
 // @route /backend/v1/renderscans/init-one
 // @access private
-export const createRenderScanContestQuizQuestionsOneControllers = async (req: Request, res: Response) => {
+export const createRenderScanContest = async (req: Request, res: Response) => {
 	await renderScanResetOneByContesyId()
 	return res.status(200).json({ message: "ok" })
 }
