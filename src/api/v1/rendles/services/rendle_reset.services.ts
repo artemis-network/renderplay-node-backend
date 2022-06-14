@@ -11,9 +11,18 @@ type gameTypeEntryFee = { [key: number]: number };
 
 const gameTypeEntryFee: gameTypeEntryFee = { 5: 1000, 6: 1500, 7: 2000 }
 
-export class RendleResetServices {
+const addTime = (time: Date, timeInMilliseconds: number) =>
+	new Date(new Date(time).getTime() + timeInMilliseconds)
 
-	static resetRendlesGameState = async () => await RendleGameState.collection.drop()
+const fiveMinutes = (1000 * 60 * 5)
+
+export class RendleResetServices {
+	
+	static resetRendlesGameState = async () => {
+		if ((await RendleGameState.countDocuments() > 0)) {
+		await RendleGameState.collection.drop()
+		}
+	}
 
 	static getRendlesByIsVisible = async (isVisible: boolean) => await RendleContest
 		.find()
@@ -22,11 +31,31 @@ export class RendleResetServices {
 		.populate('gameType')
 		.exec();
 
-	static setRendleIsVisibleAndIsExpiredToFalse = async (rendle: any) => {
-		await rendle?.update({
+	static setRendleIsVisibleToFalseAndIsExpiredToTrue = async (rendle: any) => {
+		await rendle?.updateOne({
 			$set: {
 				isVisible: false,
 				isExpired: true
+			}
+		}); await rendle?.save();
+	}
+
+	static setRendleToLive = async (rendle: any) => {
+		await rendle?.updateOne({
+			$set:{
+				startsOn: new Date(),
+				opensAt: addTime(new Date(), fiveMinutes),
+				expiresAt: addTime(new Date(), fiveMinutes)
+			}
+		}); await rendle?.save();
+	}
+
+	static setRendleToExpired = async (rendle: any) => {
+		await rendle?.updateOne({
+			$set:{
+				isExpired: true,
+				opensAt: null,
+				expiresAt: null
 			}
 		}); await rendle?.save();
 	}
