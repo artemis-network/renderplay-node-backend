@@ -1,4 +1,5 @@
 import { db } from '../../db'
+import mongoose from 'mongoose'
 
 const { RendleContest, RendleGameState } = db;
 
@@ -20,7 +21,7 @@ export const setRendleIsVisibleAndIsExpiredToFalse = async (rendle: any) => {
 	}); await rendle?.save();
 }
 
-type input = { startsOn: any, isExpired: boolean, gameType: number, gameTypeId: string }
+type input = { startsOn: any, isExpired: boolean, gameType: number, gameTypeId: string, opensAt?: any, expiresAt?: any }
 
 export const createRendleContest = async (inp: input) => {
 	await RendleContest.create({
@@ -31,6 +32,12 @@ export const createRendleContest = async (inp: input) => {
 		isExpired: inp.isExpired,
 		isVisible: true,
 		contestants: [],
-		gameType: inp.gameTypeId
+		gameType: inp.gameTypeId,
+		opensAt: inp.opensAt,
+		expiresAt: inp.expiresAt
 	})
+}
+
+export const dropRendGameState = async () => {
+	await mongoose.connection.db.dropCollection("rendle_game_states");
 }

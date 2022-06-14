@@ -26,7 +26,7 @@ type gameTypeStartsOn = { [key: number]: any };
 
 function getCurrentIndianDateTime() {
 	var time = moment.utc().format()
-	return new Date();
+	return new Date(time);
 }
 
 const gameTypeExpiryStatus: gameTypeExpiryStatus = {
@@ -51,6 +51,7 @@ const createRendleContest = async (gameType: number, entryFee: number, gameTypeI
 
 		const opensAt = addTimeToDate(gameTypeStartsOn[gameType], fiveMinutes);
 		const expiresAt = addTimeToDate(opensAt, fiveMinutes * 2)
+		console.log(opensAt, expiresAt)
 
 		const input: RendleContestInput = {
 			entryFee: entryFee,

@@ -9,10 +9,7 @@ import { doesUserPlayingRendleContest, doesUserFinishedRendleGame, getRendleExpi
 export const getRendleGameStatusController = async (req: Request, res: Response) => {
 	const { userId, contestId } = req.body
 
-	console.log(req.body)
-
 	const gameResult = await doesUserFinishedRendleGame(userId, contestId)
-	console.log(gameResult)
 	if (gameResult) return res.status(200).json(gameResult)
 
 	const isPlaying = await doesUserPlayingRendleContest(userId, contestId);
