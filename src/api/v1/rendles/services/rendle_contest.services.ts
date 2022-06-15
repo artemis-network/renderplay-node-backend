@@ -16,9 +16,10 @@ export class RendleContestServices {
 			const startsOn = rendles[i].startsOn;
 			const entryFee = rendles[i].entryFee
 			const expiresAt = rendles[i].expiresAt
+			const isExpired = rendles[i].isExpired
 			serializedRendles.push({
 				_id: id, gameType: gameType, startsOn: startsOn, entryFee: entryFee,
-				expiresAt: expiresAt
+				expiresAt: expiresAt, isExpired: isExpired
 			})
 		}
 		return { currentTime: new Date(), rendleContests: serializedRendles }
