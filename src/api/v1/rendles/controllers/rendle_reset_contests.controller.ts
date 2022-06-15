@@ -24,7 +24,7 @@ export const resetRendleContests = async (req: Request, res: Response) => {
 				gameType: rendles[index].gameType.gameType,
 				startsOn: addTime(new Date(), fourHours),
 				opensAt: addTime(new Date(), fourHours + fiveMinutes),
-				expiresAt: addTime(new Date(), fourHours + (fiveMinutes * 2)),
+				expiresAt: addTime(new Date(), fourHours + (fiveMinutes * 3)),
 			})
 			RendleResetServices.setRendleIsVisibleToFalseAndIsExpiredToTrue(rendles[index])
 			if (index === rendles.length - 1) {
