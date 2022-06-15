@@ -106,6 +106,12 @@ export class RendleContestServices {
 		} return null
 	}
 
+	static calculateOpensAtTime = (opensAt: Date) => {
+		const now = new Date().getTime()
+		const time = new Date(opensAt).getTime()
+		return (time - now) < 0
+	}
+
 	static doesUserPlayingContest = async (userId: string, contestId: string) => {
 		const contest = await RendleContest.findById(contestId).populate("contestants")
 		const contestants: any = contest?.contestants ?? [];

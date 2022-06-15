@@ -103,14 +103,11 @@ export class RendleContestController {
 			const { words }: any = await RendleGameStateServices.getWordsFromGameState(userId);
 			const { opensAt, expiresAt }: any = await RendleContestServices.getExpiryTime(contestId)
 			const wordList = [];
-			const isOpened = calculateOpensAtTime(opensAt)
+			const isOpened = RendleContestServices.calculateOpensAtTime(opensAt)
 			if (!isOpened) {
 				const response = {
-					contestId: contestId,
-					isGameCompleted: false,
-					isOpened: isOpened,
-					expiresAt: expiresAt,
-					opensAt: opensAt,
+					contestId: contestId, isGameCompleted: false, isOpened: isOpened,
+					expiresAt: expiresAt, opensAt: opensAt,
 				}
 				return res.status(200).json(response)
 			}
@@ -118,16 +115,10 @@ export class RendleContestController {
 			for (let i = 0; i < words.length; i++) wordList.push(words[i].guess)
 			const response = {
 				contestId: contestId, isGameCompleted: false, words: wordList,
-				expiresAt: expiresAt, opensAt: opensAt,
+				expiresAt: expiresAt, opensAt: opensAt, isOpened: isOpened,
 			}
 			return res.status(200).json(response)
 		}
 	}
 
-}
-
-const calculateOpensAtTime = (opensAt: Date) => {
-	const now = new Date().getTime()
-	const time = new Date(opensAt).getTime()
-	return (time - now) < 0
 }
