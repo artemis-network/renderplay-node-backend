@@ -1,4 +1,5 @@
 import { db, RendleContestantType } from '../../db'
+import { DBObject } from '../../db_object'
 
 const { RendleContest, RendleResult, RendleContestant } = db;
 
@@ -6,23 +7,33 @@ export class RendleContestServices {
 
 
 	static getContests = async () => {
-		const rendles: any = await RendleContest
-			.find().where({ isVisible: true }).populate("gameType").sort({ gameType: 1 })
-			.exec();
-		const serializedRendles = []
-		for (let i = 0; i < rendles.length; i++) {
-			const id = rendles[i]._id
-			const gameType = rendles[i].gameType?.gameType;
-			const startsOn = rendles[i].startsOn;
-			const entryFee = rendles[i].entryFee
-			const expiresAt = rendles[i].expiresAt
-			const isExpired = rendles[i].isExpired
-			serializedRendles.push({
-				_id: id, gameType: gameType, startsOn: startsOn, entryFee: entryFee,
-				expiresAt: expiresAt, isExpired: isExpired
-			})
+		try {
+			const query: any = await RendleContest
+				.find().where({ isVisible: true }).populate("gameType").sort({ gameType: 1 })
+				.exec();
+			// const query = null;
+
+			const object = new DBObject(query)
+			const rendles = object.get();
+
+			const serializedRendles = []
+			for (let i = 0; i < rendles.length; i++) {
+				const id = rendles[i]._id
+				const gameType = rendles[i].gameType?.gameType;
+				const startsOn = rendles[i].startsOn;
+				const entryFee = rendles[i].entryFee
+				const expiresAt = rendles[i].expiresAt
+				const isExpired = rendles[i].isExpired
+				serializedRendles.push({
+					_id: id, gameType: gameType, startsOn: startsOn, entryFee: entryFee,
+					expiresAt: expiresAt, isExpired: isExpired
+				})
+			}
+			return { currentTime: new Date(), rendleContests: serializedRendles }
+		} catch (error) {
+			console.log(error)
 		}
-		return { currentTime: new Date(), rendleContests: serializedRendles }
+
 	}
 
 	static doesUserAlreadyInContest = async (userId: string, contestId: string) => {

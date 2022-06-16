@@ -17,10 +17,15 @@ const addTime = (time: Date, timeInMilliseconds: number) =>
 const fiveMinutes = (1000 * 60 * 5)
 
 export class RendleResetServices {
-	
+
+	static addTime = (time: Date, timeInMilliseconds: number): Date => {
+		return new Date(new Date(time).getTime() + timeInMilliseconds)
+	}
+
+
 	static resetRendlesGameState = async () => {
 		if ((await RendleGameState.countDocuments() > 0)) {
-		await RendleGameState.collection.drop()
+			await RendleGameState.collection.drop()
 		}
 	}
 
@@ -42,7 +47,7 @@ export class RendleResetServices {
 
 	static setRendleToLive = async (rendle: any) => {
 		await rendle?.updateOne({
-			$set:{
+			$set: {
 				startsOn: new Date(),
 				opensAt: addTime(new Date(), fiveMinutes),
 				expiresAt: addTime(new Date(), fiveMinutes * 3)
@@ -52,7 +57,7 @@ export class RendleResetServices {
 
 	static setRendleToExpired = async (rendle: any) => {
 		await rendle?.updateOne({
-			$set:{
+			$set: {
 				isExpired: true,
 				opensAt: null,
 				expiresAt: null

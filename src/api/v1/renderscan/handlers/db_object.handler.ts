@@ -1,4 +1,4 @@
-import { ExceptionHandler } from '../../exceptions/db.exceptions'
+import { ErrorTypes } from '../../errors/db.errors'
 import { db } from '../../db'
 
 const {

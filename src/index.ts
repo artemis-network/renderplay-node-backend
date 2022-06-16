@@ -17,6 +17,8 @@ const init = () => logger.info(`🚀  server running on port: ${PORT}`)
 
 app.use(cors())
 app.use(json());
+app.use(express.urlencoded({ extended: true }));
+
 app.get('/', (req, res) => res.send("🚀  WELCOME TO RENDERVERSE"))
 app.use(pingRoutes);
 app.use(userRoutes);
