@@ -1,5 +1,4 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
-import { RendleContestantType } from './rendle_contestant.model'
 
 export type RendleContestType = {
 	gameType: string; entryFee: number; startsOn?: Date; minimumContestants: number;

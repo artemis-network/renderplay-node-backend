@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { RendleContestServices } from '../services/rendle_contest.services'
 import { RendleGameStateServices } from '../services/rendle_game_state.services'
 import { deductFunds, getBalance } from '../../user/services/wallet.service'
+import { HttpResponseFactory } from '../../http/http_factory'
 
 enum RendleContestState {
 	INSUFFICENT_FUNDS = "[INSUFFICENT_FUNDS]", APPROVED = "[APPROVED]",
@@ -19,40 +20,51 @@ export class RendleContestController {
 		const { contestId, userId, request, walletAddress } = req.body
 
 		const isInContest = await RendleContestServices.doesUserAlreadyInContest(userId, contestId);
-
 		const isLobbyClosed = await RendleContestServices.isLobbyClosed(contestId)
 
 		if (isInContest) {
 			const gameStateId = await RendleGameStateServices.getGameStateIdByUserId(userId)
-			return res.status(200).json({
-				message: "ok",
-				status: RendleContestState.ALREADY_IN_CONTEST,
-				gameStateId: gameStateId?._id
+			return HttpResponseFactory.OK({
+				data: {
+					message: "ok",
+					status: RendleContestState.ALREADY_IN_CONTEST,
+					gameStateId: gameStateId?._id
+				}, res: res
 			})
 		}
-		if (isLobbyClosed) return res.status(200).json({
-			isLobbyClosed: isLobbyClosed
-		})
+
+		if (isLobbyClosed)
+			return HttpResponseFactory.OK({
+				data: {
+					isLobbyClosed: isLobbyClosed
+				}, res: res
+			})
 
 		const gameEntryFee: any = await RendleContestServices.getContestEntryFee(contestId);
 		const balance: any = await getBalance(userId);
 
-		if (gameEntryFee > balance) return res.status(200).json({
-			message: "insufficent funds", status: RendleContestState.INSUFFICENT_FUNDS
-		})
+		if (gameEntryFee > balance)
+			return HttpResponseFactory.OK({
+				data: {
+					message: "insufficent funds", status: RendleContestState.INSUFFICENT_FUNDS
+				}, res: res
+			})
 
-		if (request) return res.status(200).json({
-			message: "approved", status: RendleContestState.APPROVED, approved: true
-		})
+		if (request)
+			return HttpResponseFactory.OK({
+				data: {
+					message: "approved", status: RendleContestState.APPROVED, approved: true
+				}, res: res
+			})
 
 		await deductFunds(userId, gameEntryFee)
 		await RendleContestServices.addUserToContest(userId, contestId, walletAddress, gameEntryFee);
 		const gameState = await RendleGameStateServices.createGameStateForUser(userId, contestId)
-		return res.status(200).json({
-			message: "ok",
-			error: false,
-			gameStateId: gameState.gameStateId
-		});
+
+		return HttpResponseFactory.OK({
+			data: { message: "ok", error: false, gameStateId: gameState.gameStateId },
+			res: res
+		})
 	}
 
 
@@ -73,7 +85,7 @@ export class RendleContestController {
 
 		await RendleContestServices.saveContestResult(gameType, contestId, contestant?._id, completedIn, chances, isWon, words)
 		await RendleGameStateServices.cleanGameState(userId)
-		return res.status(200).json({})
+		return HttpResponseFactory.CREATED({ data: {}, res: res })
 	}
 
 	// @desc get rendle contests
@@ -82,9 +94,9 @@ export class RendleContestController {
 	static getContests = async (req: Request, res: Response) => {
 		try {
 			const rendles = await RendleContestServices.getContests();
-			return res.status(200).json(rendles);
+			return HttpResponseFactory.OK({ data: rendles, res: res })
 		} catch (e) {
-			return res.status(200).json(e);
+			return HttpResponseFactory.OK({ data: e, res: res })
 		}
 	}
 
@@ -94,8 +106,9 @@ export class RendleContestController {
 	static getGameStatus = async (req: Request, res: Response) => {
 		const { userId, contestId } = req.body
 
-		const gameResult = await RendleContestServices.doesUserFinishedGame(userId, contestId)
-		if (gameResult) return res.status(200).json(gameResult)
+		const response = await RendleContestServices.doesUserFinishedGame(userId, contestId)
+		if (response)
+			return HttpResponseFactory.OK({ data: response, res: res })
 
 		const isPlaying = await RendleContestServices.doesUserPlayingContest(userId, contestId);
 
@@ -103,13 +116,21 @@ export class RendleContestController {
 			const { words }: any = await RendleGameStateServices.getWordsFromGameState(userId);
 			const { opensAt, expiresAt }: any = await RendleContestServices.getExpiryTime(contestId)
 			const wordList = [];
+			const isOpened = RendleContestServices.calculateOpensAtTime(opensAt)
+			if (!isOpened) {
+				const response = {
+					contestId: contestId, isGameCompleted: false, isOpened: isOpened,
+					expiresAt: expiresAt, opensAt: opensAt,
+				}
+				return HttpResponseFactory.OK({ data: response, res: res })
+			}
+
 			for (let i = 0; i < words.length; i++) wordList.push(words[i].guess)
 			const response = {
 				contestId: contestId, isGameCompleted: false, words: wordList,
-				expiresAt: expiresAt, opensAt: opensAt,
+				expiresAt: expiresAt, opensAt: opensAt, isOpened: isOpened,
 			}
-			return res.status(200).json(response)
+			return HttpResponseFactory.OK({ data: response, res: res })
 		}
 	}
-
 }

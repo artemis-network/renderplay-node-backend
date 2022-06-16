@@ -72,7 +72,6 @@ const createRendleContest = async (gameType: number, entryFee: number, gameTypeI
 
 		const opensAt = addTimeToDate(gameTypeStartsOn[gameType], fiveMinutes);
 		const expiresAt = addTimeToDate(opensAt, fiveMinutes * 2)
-		console.log(opensAt, expiresAt)
 
 		const input: RendleContestInput = {
 			entryFee: entryFee,

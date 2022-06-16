@@ -1,7 +1,7 @@
 import express from 'express';
 
 import { rendlesInit, destoryRendle } from './controllers/rendle_init.controller'
-import { resetRendleContests } from './controllers/rendle_reset_contests.controller'
+import { RendleResetController } from './controllers/rendle_reset_contests.controller'
 
 import { RendleGameStateController } from './controllers/rendle_game_state.controller'
 import { RendleContestController } from './controllers/rendle_contest.controller'
@@ -14,7 +14,7 @@ const router = express.Router();
 
 router.post(`${rendlesPrefix}/init`, adminAuthenticatorMiddleWare, rendlesInit);
 router.post(`${rendlesPrefix}/destroy`, adminAuthenticatorMiddleWare, destoryRendle);
-router.post(`${rendlesPrefix}/reset`, adminAuthenticatorMiddleWare, resetRendleContests);
+router.post(`${rendlesPrefix}/reset`, adminAuthenticatorMiddleWare, RendleResetController.resetContests);
 
 router.get(rendlesPrefix, RendleContestController.getContests);
 
