@@ -1,5 +1,13 @@
 import { db } from '../../db'
-const { RendleGameState, RendleWord } = db;
+import { fiveLetterList } from '../config/fiveLetterList'
+import { sixLetterList } from '../config/sixLetterList'
+import { sevenLetterList } from '../config/sevenLetterList'
+import { fiveLetterGuesses } from '../config/fiveLetterGuesses'
+import { sixLetterGuesses } from '../config/sixLetterGuesses'
+import { sevenLetterGuesses } from '../config/sevenLetterGuesses'
+
+
+const { RendleContest, RendleGameState, RendleWord } = db;
 
 
 export class RendleGameStateServices {
@@ -66,5 +74,30 @@ export class RendleGameStateServices {
 		} catch (error) {
 			return { message: `Something went wrong ${error}` }
 		}
+	}
+
+	static getGameTypeFromContest = async (contestId: string) => {
+		const contest:any = await RendleContest.findById(contestId).populate("gameType")
+		return { gameType: contest?.gameType.gameType}
+	}
+
+	static getAnswerForTheContest = async (contestId: string) => {
+		const gameType = await this.getGameTypeFromContest(contestId)
+		
+	}
+
+	// static validateGuessesFromWordsList = async (word: string, gameType: string, answer: string) => {
+	// 	if (gameType == '5' && fiveLetterGuesses.indexOf(word.toLocaleLowerCase()) > -1){
+			
+	// 	}
+	// 	else if (gameType == '6' && sixLetterGuesses.indexOf(word.toLocaleLowerCase()) > -1){
+
+	// 	}
+	// 	else if (gameType == '7' && sevenLetterGuesses.indexOf(word.toLocaleLowerCase()) > -1){
+			
+	// 	}
+	// 	else{
+
+	// 	}
 	}
 }

@@ -23,7 +23,8 @@ router.post(`${rendlesPrefix}/status`, RendleContestController.getGameStatus);
 router.post(`${rendlesPrefix}/save`, RendleContestController.saveContestResult);
 
 
-router.post(`${rendlesPrefix}/words`, RendleGameStateController.getRendleCurrentGuesses);
-router.post(`${rendlesPrefix}/words/update`, RendleGameStateController.updateCurrentGuesses);
+router.post(`${rendlesPrefix}/game/words`, RendleGameStateController.getRendleCurrentGuesses);
+router.post(`${rendlesPrefix}/game/words/validate`, RendleGameStateController.validateCurrentGuesses);
+router.post(`${rendlesPrefix}/game/:contestId`, RendleGameStateController.getGameTypeFromContestId);
 
 export { router as rendleRoutes }

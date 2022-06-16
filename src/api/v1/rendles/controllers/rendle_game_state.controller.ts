@@ -15,10 +15,18 @@ export class RendleGameStateController {
 	// @desc update new word to rendle contest
 	// @route /backend/v1/rendles/words/update
 	// @access public
-	static updateCurrentGuesses = async (req: Request, res: Response) => {
-		const { userId, word } = req.body
-		const response = await
-			RendleGameStateServices.updateGuessessListInGameStateByUserId(userId, word)
+	static validateCurrentGuesses = async (req: Request, res: Response) => {
+		const { userId, contestId, word } = req.body
+		const answer = await RendleGameStateServices.getAnswerForTheContest(contestId);
+		// const response = await
+		// 	RendleGameStateServices.validateGuessesFromWordsList(word, gameType)
+		return res.status(200).json(null)
+	}
+
+	static getGameTypeFromContestId = async (req: Request, res: Response) => {
+		const { contestId } = req.params
+		const gameType = await RendleGameStateServices.getGameTypeFromContest(contestId);
+		const response =  { gameType: gameType }
 		return res.status(200).json(response)
 	}
 
