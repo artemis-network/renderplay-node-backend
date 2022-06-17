@@ -19,9 +19,12 @@ export class RendleContestController {
 
 		const { contestId, userId, request, walletAddress } = req.body
 
+		const isContestOpened = await RendleContestServices.isContestOpened(contestId); 
+		if(!isContestOpened)
+			return HttpResponseFactory.OK({data: {isContestOpened: false}, res: res})
+
 		const isInContest = await RendleContestServices.doesUserAlreadyInContest(userId, contestId);
 		const isLobbyClosed = await RendleContestServices.isLobbyClosed(contestId)
-
 		if (isInContest) {
 			const gameStateId = await RendleGameStateServices.getGameStateIdByUserId(userId)
 			return HttpResponseFactory.OK({
@@ -105,32 +108,79 @@ export class RendleContestController {
 	// @access public
 	static getGameStatus = async (req: Request, res: Response) => {
 		const { userId, contestId } = req.body
+		const currTime = new Date()
+		const isGameStatePresent = await RendleContestServices.doesUserHaveGameState(userId, contestId)
+		console.log(isGameStatePresent)
+		if(!isGameStatePresent)
+			return HttpResponseFactory.NOT_FOUND({ data: {isValidGameEntry : false, currentTime: currTime}, res: res })
 
-		const response = await RendleContestServices.doesUserFinishedGame(userId, contestId)
-		if (response)
-			return HttpResponseFactory.OK({ data: response, res: res })
+		const isGameCompleted = await RendleContestServices.doesUserFinishedGame(userId, contestId)
+		if (isGameCompleted)
+			return HttpResponseFactory.OK({ data: isGameCompleted, res: res })
 
 		const isPlaying = await RendleContestServices.doesUserPlayingContest(userId, contestId);
+		const gameType = await RendleContestServices.getGameTypeFromContest(contestId);
 
 		if (isPlaying) {
 			const { words }: any = await RendleGameStateServices.getWordsFromGameState(userId);
 			const { opensAt, expiresAt }: any = await RendleContestServices.getExpiryTime(contestId)
 			const wordList = [];
+			const statusList = [];
 			const isOpened = RendleContestServices.calculateOpensAtTime(opensAt)
 			if (!isOpened) {
 				const response = {
-					contestId: contestId, isGameCompleted: false, isOpened: isOpened,
-					expiresAt: expiresAt, opensAt: opensAt,
+					isGameCompleted: false, isOpened: isOpened,
+					expiresAt: expiresAt, opensAt: opensAt, ...gameType, currentTime: currTime
 				}
 				return HttpResponseFactory.OK({ data: response, res: res })
 			}
 
-			for (let i = 0; i < words.length; i++) wordList.push(words[i].guess)
-			const response = {
-				contestId: contestId, isGameCompleted: false, words: wordList,
-				expiresAt: expiresAt, opensAt: opensAt, isOpened: isOpened,
+			for (let i = 0; i < words.length; i++) {
+				wordList.push(words[i].guess)
+				statusList.push(words[i].status)
 			}
+
+			const response = {
+				isGameCompleted: false, words: wordList, guessStatus: statusList,
+				expiresAt: expiresAt, opensAt: opensAt, isOpened: isOpened, ...gameType, currentTime: currTime
+			}
+
 			return HttpResponseFactory.OK({ data: response, res: res })
 		}
+
+		else{
+			const response = {isValidGameEntry: false, currentTime: currTime}
+			return HttpResponseFactory.NOT_FOUND({data: response, res: res});
+		}
 	}
+
+	// @desc get status of current contest
+	// @route /backend/v1/rendles/status
+	// @access public
+	static validateAndUpdateCurrentGuesses = async (req: Request, res: Response) => {
+		const { index, guess, contestId, userId } = req.body;
+
+		const gameType:any = await (await RendleContestServices.getGameTypeFromContest(contestId)).gameType;
+		const isSessionAlreadyInUse = await RendleGameStateServices.isIndexAlreadyInGameState(userId, index, gameType);
+		if(isSessionAlreadyInUse){
+			const response = {isSessionAlreadyInUse: isSessionAlreadyInUse }
+			return HttpResponseFactory.NOT_ACCEPTABLE({ data: response, res:res })
+		}
+		const isValidGuess = await RendleContestServices.isWordPresentInValidGuessList(gameType, guess);
+		if(isValidGuess){
+			const {guessStatus, isWinningWord}:any = await RendleContestServices.getGuessStatuses(gameType, contestId, guess);
+			const gameStateId = await RendleGameStateServices.updateGuessessListInGameStateByUserId ( userId, guess, guessStatus)
+			const response = {isValidGuess: isValidGuess, isWinningWord: isWinningWord, guessStatus: guessStatus, ...gameStateId}
+			
+			return HttpResponseFactory.OK({data: response, res: res})
+		}
+		else{
+			const response = {isValidGuess: isValidGuess}
+			return HttpResponseFactory.OK({data: response, res: res})
+		}
+
+
+	}
+
+
 }

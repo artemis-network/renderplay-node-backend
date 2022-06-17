@@ -1,10 +1,5 @@
 import { db } from '../../db'
-import { fiveLetterList } from '../config/fiveLetterList'
-import { sixLetterList } from '../config/sixLetterList'
-import { sevenLetterList } from '../config/sevenLetterList'
-import { fiveLetterGuesses } from '../config/fiveLetterGuesses'
-import { sixLetterGuesses } from '../config/sixLetterGuesses'
-import { sevenLetterGuesses } from '../config/sevenLetterGuesses'
+
 
 
 const { RendleContest, RendleGameState, RendleWord } = db;
@@ -40,9 +35,9 @@ export class RendleGameStateServices {
 		}
 	}
 
-	static updateGuessessListInGameStateByUserId = async (userId: string, word: string) => {
+	static updateGuessessListInGameStateByUserId = async (userId: string, word: string, status: Array<string>) => {
 		try {
-			const rendleWord = await RendleWord.create({ guess: word })
+			const rendleWord = await RendleWord.create({ guess: word, status: [...status] })
 			const gameState = await RendleGameState.findOne({ userId: userId })
 			await gameState?.updateOne({
 				$set: {
@@ -76,28 +71,24 @@ export class RendleGameStateServices {
 		}
 	}
 
-	static getGameTypeFromContest = async (contestId: string) => {
-		const contest:any = await RendleContest.findById(contestId).populate("gameType")
-		return { gameType: contest?.gameType.gameType}
-	}
 
-	static getAnswerForTheContest = async (contestId: string) => {
-		const gameType = await this.getGameTypeFromContest(contestId)
-		
-	}
 
-	// static validateGuessesFromWordsList = async (word: string, gameType: string, answer: string) => {
-	// 	if (gameType == '5' && fiveLetterGuesses.indexOf(word.toLocaleLowerCase()) > -1){
-			
-	// 	}
-	// 	else if (gameType == '6' && sixLetterGuesses.indexOf(word.toLocaleLowerCase()) > -1){
+	static isIndexAlreadyInGameState = async (userId:string, index: number, gameType: number) => {
+		const gameState: any = await RendleGameState
+				.findOne({ userId: userId }).populate('words').exec()
+		const len = await gameState?.words.length;
+		if(index <= len){
+			// wrong entry
+			return true;
+		}
+		else{
+			if(index > gameType){
+				//wrong entry
+				return true
+			}
+			//correct entry
+			return false;
+		}
 
-	// 	}
-	// 	else if (gameType == '7' && sevenLetterGuesses.indexOf(word.toLocaleLowerCase()) > -1){
-			
-	// 	}
-	// 	else{
-
-	// 	}
 	}
 }

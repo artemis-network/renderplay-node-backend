@@ -1,4 +1,4 @@
-export const FiveLetterGuesses = [
+export const fiveLetterGuesses = [
   'aahed',
   'aalii',
   'aargh',

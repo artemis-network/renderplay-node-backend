@@ -6,6 +6,8 @@ export type RendleWordDocument = Document & RendleWordType;
 
 const rendleWordSchema = new Schema({
 	guess: { type: Schema.Types.String, required: true, },
+	status: { type: Schema.Types.Array, required: true, },
+
 });
 
 export const RendleWord: Model<RendleWordDocument> = mongoose

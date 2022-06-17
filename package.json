@@ -20,6 +20,7 @@
     "@types/jwt-simple": "^0.5.33",
     "@types/moment": "^2.13.0",
     "@types/multer": "^1.4.7",
+    "@types/random-seed": "^0.3.3",
     "@types/supertest": "^2.0.12",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.0",
@@ -37,6 +38,7 @@
     "multer": "^1.4.4",
     "multer-azure": "^2.0.1",
     "nodemailer": "^6.7.5",
+    "random-seed": "^0.3.0",
     "winston": "^3.7.2"
   },
   "devDependencies": {

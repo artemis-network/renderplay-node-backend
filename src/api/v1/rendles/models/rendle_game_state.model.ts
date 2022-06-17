@@ -2,7 +2,7 @@ import mongoose, { Schema, Model, Document } from 'mongoose';
 import { UserType, RendleContestType, RendleWordType } from '../../db'
 
 export type RendleGameStateType = {
-	user: string; contest: string, words: string[],
+	userId: string; contestId: string, words: string[],
 }
 
 export type RendleGameStateDocument = Document & RendleGameStateType;

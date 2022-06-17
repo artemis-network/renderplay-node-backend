@@ -1,4 +1,4 @@
-export const SevenLetterGuesses = ['aarrghh',
+export const sevenLetterGuesses = ['aarrghh',
 	'abactor',
 	'abalone',
 	'abanded',
