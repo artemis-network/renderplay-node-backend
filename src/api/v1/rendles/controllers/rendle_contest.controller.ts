@@ -108,15 +108,16 @@ export class RendleContestController {
 	// @access public
 	static getGameStatus = async (req: Request, res: Response) => {
 		const { userId, contestId } = req.body
+
 		const currTime = new Date()
 		const isGameStatePresent = await RendleContestServices.doesUserHaveGameState(userId, contestId)
-		console.log(isGameStatePresent)
-		if(!isGameStatePresent)
-			return HttpResponseFactory.NOT_FOUND({ data: {isValidGameEntry : false, currentTime: currTime}, res: res })
-
 		const isGameCompleted = await RendleContestServices.doesUserFinishedGame(userId, contestId)
+
 		if (isGameCompleted)
 			return HttpResponseFactory.OK({ data: isGameCompleted, res: res })
+
+		if(!isGameStatePresent)
+			return HttpResponseFactory.OK({ data: {isValidGameEntry : false, currentTime: currTime}, res: res })
 
 		const isPlaying = await RendleContestServices.doesUserPlayingContest(userId, contestId);
 		const gameType = await RendleContestServices.getGameTypeFromContest(contestId);
@@ -150,7 +151,7 @@ export class RendleContestController {
 
 		else{
 			const response = {isValidGameEntry: false, currentTime: currTime}
-			return HttpResponseFactory.NOT_FOUND({data: response, res: res});
+			return HttpResponseFactory.OK({data: response, res: res});
 		}
 	}
 

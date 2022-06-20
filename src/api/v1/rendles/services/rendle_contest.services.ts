@@ -123,8 +123,6 @@ export class RendleContestServices {
 	static doesUserHaveGameState = async (userId: string, contestId: string) => {
 		const gameStateId = await RendleGameState
 		.findOne({ userId: userId }).where({ contestId: contestId })
-
-		console.log(gameStateId)
 		
 		if(gameStateId !== null){
 			return true;
