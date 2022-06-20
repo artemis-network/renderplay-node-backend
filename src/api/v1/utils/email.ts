@@ -1,9 +1,10 @@
 import nodemailer from 'nodemailer';
 import { EMAIL_CONFIG } from '../../../config'
+import { userPrefix } from '../config'
+import { verificationHtml, forgotPasswordHtml } from './verificationHtml';
+export class EmailSender {
 
-class EmailSender {
-
-	private getTransporter() {
+	static getTransporter() {
 		return nodemailer.createTransport({
 			host: EMAIL_CONFIG.host,
 			port: Number(EMAIL_CONFIG.port),
@@ -19,7 +20,7 @@ class EmailSender {
 		});
 	}
 
-	async sendEmailVerificationEmail(from: string, to: string, subject: string, text: string, html: string) {
+	static async sendMail(from: string, to: string, subject: string, text: string, html: string) {
 		return await this.getTransporter().sendMail({
 			from: EMAIL_CONFIG.email, // sender address
 			to: to, // list of receivers
@@ -28,11 +29,14 @@ class EmailSender {
 			html: html, // html body
 		});
 	}
+		
+	static getEmailVerificationHTML(token: string): string {
+		const url:string = `https://play.renderverse.io/verify/${token}`
+		return verificationHtml(url);
+	}
 
+	static getForgotPasswordHTML(token: string): string {
+		const url:string = `https://play.renderverse.io/change-password/${token}`
+		return forgotPasswordHtml(url);
+	}
 }
-
-function getEmailVerificationHTML(token: string): string {
-	return `<html lang="en"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Document</title></head><body><a href="${token}">Confirm Email</a></body></html>'.`
-}
-
-export { getEmailVerificationHTML, EmailSender }

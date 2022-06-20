@@ -3,8 +3,12 @@ import bcrypt from 'bcrypt';
 import { logger } from '../../utils/logger';
 import { createToken } from '../../utils/token'
 import { OAuth2Client } from 'google-auth-library'
+<<<<<<< HEAD
+import { EmailSender, getEmailVerificationHTML } from '../../utils/email'
+=======
 import { generateJWTToken, decodeJWTToken } from '../../utils/jwt';
 import { EmailSender } from '../../utils/email'
+>>>>>>> bd14ba29b3ddfea4359e36044b2285aacf1b18f1
 import { GOOGLE_OAUTH_CLIENT } from '../../../../config'
 
 const client: any = new OAuth2Client(GOOGLE_OAUTH_CLIENT)
@@ -19,7 +23,22 @@ interface Result {
 	username?: string, email?: string, accessToken?: string, publicToken?: string
 }
 
+<<<<<<< HEAD
+const sendVerificationEmailForUser = async (token: string, email: string, username: string) => {
+	try {
+		logger.info(">> sending verification email to " + username + " >> ");
+		const html: string = getEmailVerificationHTML("");
+		const emailSender: EmailSender = new EmailSender();
+		emailSender.sendEmailVerificationEmail("contact@renderverse.io", email, "Verify Email", "", html.toString());
+		logger.info(">> verification email has sent to " + username + " >> ");
+	} catch (e) {
+		logger.error(e);
+		throw new Error()
+	}
+}
+=======
 export class UserServices {
+>>>>>>> bd14ba29b3ddfea4359e36044b2285aacf1b18f1
 
 	static setToken = async (email: string) => {
 		const token = createToken();
@@ -27,22 +46,6 @@ export class UserServices {
 			$set: { token: token }
 		});
 		return token;
-	}
-
-	static updateToken = async (token: string) => {
-		const newToken = createToken();
-		await User.findOneAndUpdate({ token: token }, {
-			$set: { token: newToken }
-		});
-		return newToken;
-	}
-
-	static setIsVerified = async (token: string, isVerified: boolean) => {
-		await User.findOneAndUpdate({ token: token }, {
-			$set: {
-				isVerified: isVerified
-			}
-		});
 	}
 
 	static isValidToken = async (token: string) => {
@@ -74,7 +77,7 @@ export class UserServices {
 	static createUser = async (username: string, email: string, password: string, isGoogleAccount: boolean) => {
 		try {
 			const token: string = createToken();
-			const hash = await UserServices.hashPassword(password)
+			const hash = UserServices.hashPassword(password)
 			const newUser = await User.create({
 				username: username, email: email, password: hash, token: token,
 				isActivated: false, isGoogleAccount: false, isVerified: false,
@@ -82,7 +85,7 @@ export class UserServices {
 			await UserServices.createWalletForUser(newUser._id)
 			const html: string = EmailSender.getEmailVerificationHTML(token);
 			await EmailSender.sendMail(
-				"contact@renderverse.io", email, "Welcome to Renderplay, Please Verify Your Email", "", html.toString()
+				"contact@renderverse.io", email, "Verify Email", "", html.toString()
 			);
 			return { message: "Success", errorType: "NONE", error: false, status: 200 };
 		} catch (err: any) {
@@ -118,7 +121,6 @@ export class UserServices {
 				}
 				return response;
 			}
-
 			const token: string = generateJWTToken(username);
 
 			const result: Result = {
