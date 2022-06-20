@@ -46,6 +46,7 @@ export class UserController {
 	static validateToken = async (req: Request, res: Response) => {
 		const { token } = req.params;
 		const isVerified = await UserServices.isValidToken(token)
+		await UserServices.setIsVerified(token, isVerified)
 		return HttpResponseFactory.OK({
 			data: { isVerified: isVerified },
 			res: res

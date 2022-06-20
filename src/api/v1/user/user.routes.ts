@@ -26,7 +26,7 @@ router.post(`${userPrefix}/google-mobile-login`, UserController.createMobileGoog
 router.post(`${userPrefix}/validate/:token`, UserController.validateToken)
 
 router.post(`${userPrefix}/forgot-password/request`, UserController.forgotPasswordSendRequest)
-router.post(`${userPrefix}/forgot-password/:token`, UserController.changePassword)
+router.post(`${userPrefix}/change-password/:token`, UserController.changePassword)
 
 router.get(`${userPrefix}/test-token`, authorizeUserMiddleWare, (req, res) => res.send("hello"));
 

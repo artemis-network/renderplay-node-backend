@@ -29,6 +29,14 @@ export class UserServices {
 		return token;
 	}
 
+	static setIsVerified = async (token: string, isVerified: boolean) => {
+		await User.findOneAndUpdate({ token: token }, {
+			$set: {
+				isVerified: isVerified
+			}
+		});
+	}
+
 	static isValidToken = async (token: string) => {
 		const user = await User.findOne({ token: token });
 		if (!user) return false
@@ -58,7 +66,7 @@ export class UserServices {
 	static createUser = async (username: string, email: string, password: string, isGoogleAccount: boolean) => {
 		try {
 			const token: string = createToken();
-			const hash = UserServices.hashPassword(password)
+			const hash = await UserServices.hashPassword(password)
 			const newUser = await User.create({
 				username: username, email: email, password: hash, token: token,
 				isActivated: false, isGoogleAccount: false, isVerified: false,

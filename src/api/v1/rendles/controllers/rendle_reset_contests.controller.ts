@@ -2,8 +2,6 @@ import { Request, Response } from 'express';
 import { RendleResetServices } from '../services/rendle_reset.services'
 
 export class RendleResetController {
-
-
 	// @desc reset all rendle contests
 	// @route /backend/v1/rendles/reset
 	// @access private
