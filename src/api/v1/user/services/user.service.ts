@@ -4,7 +4,7 @@ import { logger } from '../../utils/logger';
 import { createToken } from '../../utils/token'
 import { generateJWTToken, decodeJWTToken } from '../../utils/jwt';
 import { OAuth2Client } from 'google-auth-library'
-// import { EmailSender, getEmailVerificationHTML } from '../../utils/email'
+import { EmailSender, getEmailVerificationHTML } from '../../utils/email'
 import { GOOGLE_OAUTH_CLIENT } from '../../../../config'
 
 const client: any = new OAuth2Client(GOOGLE_OAUTH_CLIENT)
@@ -41,18 +41,18 @@ interface Result {
 	publicToken?: string
 }
 
-// const sendVerificationEmailForUser = async (token: string, email: string, username: string) => {
-// 	try {
-// 		logger.info(">> sending verification email to " + username + " >> ");
-// 		const html: string = getEmailVerificationHTML("");
-// 		const emailSender: EmailSender = new EmailSender();
-// 		emailSender.sendEmailVerificationEmail("contact@renderverse.io", email, "Verify Email", "", html.toString());
-// 		logger.info(">> verification email has sent to " + username + " >> ");
-// 	} catch (e) {
-// 		logger.error(e);
-// 		throw new Error()
-// 	}
-// }
+const sendVerificationEmailForUser = async (token: string, email: string, username: string) => {
+	try {
+		logger.info(">> sending verification email to " + username + " >> ");
+		const html: string = getEmailVerificationHTML("");
+		const emailSender: EmailSender = new EmailSender();
+		emailSender.sendEmailVerificationEmail("contact@renderverse.io", email, "Verify Email", "", html.toString());
+		logger.info(">> verification email has sent to " + username + " >> ");
+	} catch (e) {
+		logger.error(e);
+		throw new Error()
+	}
+}
 
 const createWalletForUser = (user_id: string) => {
 	logger.info(">> creating wallet for" + user_id + " >> ");

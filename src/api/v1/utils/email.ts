@@ -3,31 +3,30 @@ import { EMAIL_CONFIG } from '../../../config'
 
 class EmailSender {
 
-	// private getTransporter() {
-	// 	return nodemailer.createTransport({
-	// 		host: EMAIL_CONFIG.host,
-	// 		port: Number(EMAIL_CONFIG.port),
-	// 		secure: false,
-	// 		debug: true,
-	// 		logger: true,
-	// 		tls: {
-	// 			ciphers: 'SSLv3'
-	// 		},
-	// 		auth: {
-	// 			user: EMAIL_CONFIG.username,
-	// 			pass: EMAIL_CONFIG.password,
-	// 		},
-	// 	});
-	// }
+	private getTransporter() {
+		return nodemailer.createTransport({
+			host: EMAIL_CONFIG.host,
+			port: Number(EMAIL_CONFIG.port),
+			secure: false,
+			requireTLS : true,
+			tls: {
+				ciphers: 'SSLv3'
+			},
+			auth: {
+				user: EMAIL_CONFIG.username,
+				pass: EMAIL_CONFIG.password,
+			},
+		});
+	}
 
 	async sendEmailVerificationEmail(from: string, to: string, subject: string, text: string, html: string) {
-		// return await this.getTransporter().sendMail({
-		// 	from: from, // sender address
-		// 	to: to, // list of receivers
-		// 	subject: subject, // Subject line
-		// 	text: text, // plain text body
-		// 	html: html, // html body
-		// });
+		return await this.getTransporter().sendMail({
+			from: EMAIL_CONFIG.email, // sender address
+			to: to, // list of receivers
+			subject: subject, // Subject line
+			text: text, // plain text body
+			html: html, // html body
+		});
 	}
 
 }
