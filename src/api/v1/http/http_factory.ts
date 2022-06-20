@@ -24,4 +24,8 @@ export class HttpResponseFactory {
 	static INTERNAL_SERVER_ERROR(http: HttpResponse) {
 		return this.resp(HTTP_STATUS.INTERNAL_SERVER_ERROR, http.data, http.res);
 	}
+
+	static NOT_ACCEPTABLE(http: HttpResponse) {
+		return this.resp(HTTP_STATUS.NOT_ACCEPTABLE, http.data, http.res);
+	}
 }

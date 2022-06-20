@@ -1,5 +1,8 @@
 import { db } from '../../db'
-const { RendleGameState, RendleWord } = db;
+
+
+
+const { RendleContest, RendleGameState, RendleWord } = db;
 
 
 export class RendleGameStateServices {
@@ -32,9 +35,9 @@ export class RendleGameStateServices {
 		}
 	}
 
-	static updateGuessessListInGameStateByUserId = async (userId: string, word: string) => {
+	static updateGuessessListInGameStateByUserId = async (userId: string, word: string, status: Array<string>) => {
 		try {
-			const rendleWord = await RendleWord.create({ guess: word })
+			const rendleWord = await RendleWord.create({ guess: word, status: [...status] })
 			const gameState = await RendleGameState.findOne({ userId: userId })
 			await gameState?.updateOne({
 				$set: {
@@ -66,5 +69,26 @@ export class RendleGameStateServices {
 		} catch (error) {
 			return { message: `Something went wrong ${error}` }
 		}
+	}
+
+
+
+	static isIndexAlreadyInGameState = async (userId:string, index: number, gameType: number) => {
+		const gameState: any = await RendleGameState
+				.findOne({ userId: userId }).populate('words').exec()
+		const len = await gameState?.words.length;
+		if(index <= len){
+			// wrong entry
+			return true;
+		}
+		else{
+			if(index > gameType){
+				//wrong entry
+				return true
+			}
+			//correct entry
+			return false;
+		}
+
 	}
 }

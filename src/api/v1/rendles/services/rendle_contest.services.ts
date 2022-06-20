@@ -1,5 +1,13 @@
 import { db, RendleContestantType } from '../../db'
+import rand from 'random-seed'
 import { DBObject } from '../../db_object'
+import { fiveLetterList } from '../config/fiveLetterList'
+import { sixLetterList } from '../config/sixLetterList'
+import { sevenLetterList } from '../config/sevenLetterList'
+import { fiveLetterGuesses } from '../config/fiveLetterGuesses'
+import { sixLetterGuesses } from '../config/sixLetterGuesses'
+import { sevenLetterGuesses } from '../config/sevenLetterGuesses'
+import { RendleGameState } from '../models/rendle_game_state.model'
 
 const { RendleContest, RendleResult, RendleContestant } = db;
 
@@ -44,6 +52,19 @@ export class RendleContestServices {
 		return false
 	}
 
+	static getGameTypeFromContest = async (contestId: string) =>  {
+		const contest:any = await RendleContest.findById(contestId).populate("gameType")
+		return { gameType: contest?.gameType.gameType}
+	}
+
+	static isContestOpened = async (contestId: string) => {
+		const contest: any = await RendleContest.findById(contestId)
+		const constestTime = new Date(contest?.startsOn).getTime()
+		const now = new Date().getTime()
+		const isContestOpened = now - constestTime
+		if(isContestOpened > 0) return true
+		return false
+	}
 	static isLobbyClosed = async (contestId: string) => {
 		const contest: any = await RendleContest.findById(contestId)
 		const lobbyTime = new Date(contest?.opensAt).getTime()
@@ -97,6 +118,18 @@ export class RendleContestServices {
 		}
 	}
 
+	static doesUserHaveGameState = async (userId: string, contestId: string) => {
+		const gameStateId = await RendleGameState
+		.findOne({ userId: userId }).where({ contestId: contestId })
+		
+		if(gameStateId !== null){
+			return true;
+		}
+
+		return false;
+	
+	}
+
 	static doesUserFinishedGame = async (userId: string, contestId: string) => {
 		const contestant = await RendleContestant
 			.findOne({ user: userId }).where({ contest: contestId })
@@ -136,4 +169,63 @@ export class RendleContestServices {
 		const contest = await RendleContest.findById(contestId)
 		return { expiresAt: contest?.expiresAt, opensAt: contest?.opensAt }
 	}
+
+	static getWinningWord = async (contestId: string, gameType: number) => {
+		var gen = rand.create(contestId)
+		if(gameType == 5){
+			var n = gen(fiveLetterList.length)
+			return fiveLetterList[n]
+		}
+		else if(gameType == 6){
+			var n = gen(sixLetterList.length)
+			return sixLetterList[n]
+		}
+		else if(gameType == 7){
+			var n = gen(sevenLetterList.length)
+			return sevenLetterList[n]
+		}
+	}
+
+
+	static isWordPresentInValidGuessList = async (gameType: number, guess: string) => {
+		console.log("guess - " + guess)
+		if (gameType == 5 && fiveLetterGuesses.indexOf(guess.toLowerCase()) > -1){
+			return true;
+		}
+		else if (gameType == 6 && sixLetterGuesses.indexOf(guess.toLowerCase()) > -1){
+			return true;
+		}
+		else if (gameType == 7 && sevenLetterGuesses.indexOf(guess.toLowerCase()) > -1){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
+	static getGuessStatuses = async (gameType: number, contestId:string, guess: string) => {
+		const solution:any = await this.getWinningWord(contestId, gameType)
+		const guessStatus = []
+		var isWinningWord:boolean = true
+		console.log("solution - " + solution)
+		for(let i = 0; i < guess.length; i++){
+			if(guess[i].toLowerCase() === solution[i]){
+				console.log('yes')
+				guessStatus.push("correct")
+			}else {
+				console.log('no')
+				isWinningWord = false;
+				guessStatus.push(await this.isLetterInWord(solution, guess[i]))
+			}
+		}
+		return {guessStatus:guessStatus,isWinningWord:isWinningWord}
+	}
+
+	static isLetterInWord(solution:string, letter:string){
+		for(let i =0; i< solution.length; i++)
+			if(solution[i] === letter.toLowerCase()) return "present"
+		return "absent"
+	}
+
+
 }

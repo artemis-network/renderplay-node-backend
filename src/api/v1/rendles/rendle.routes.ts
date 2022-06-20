@@ -19,11 +19,8 @@ router.post(`${rendlesPrefix}/reset`, adminAuthenticatorMiddleWare, RendleResetC
 router.get(rendlesPrefix, RendleContestController.getContests);
 
 router.post(`${rendlesPrefix}/enter`, RendleContestController.enterContest);
-router.post(`${rendlesPrefix}/status`, RendleContestController.getGameStatus);
 router.post(`${rendlesPrefix}/save`, RendleContestController.saveContestResult);
-
-
-router.post(`${rendlesPrefix}/words`, RendleGameStateController.getRendleCurrentGuesses);
-router.post(`${rendlesPrefix}/words/update`, RendleGameStateController.updateCurrentGuesses);
+router.post(`${rendlesPrefix}/game/status`, RendleContestController.getGameStatus);
+router.post(`${rendlesPrefix}/game/word/validate`, RendleContestController.validateAndUpdateCurrentGuesses);
 
 export { router as rendleRoutes }
