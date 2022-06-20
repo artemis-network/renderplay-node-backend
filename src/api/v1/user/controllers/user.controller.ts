@@ -1,29 +1,69 @@
 import { Request, Response } from 'express';
-import { createUser, loginUser, googleLogin, googleMobileLogin, } from '../services/user.service'
+import { UserServices } from '../services/user.service'
+import { createToken } from '../../utils/token'
+import { EmailSender } from '../../utils/email'
+import { HttpResponseFactory } from '../../http/http_factory';
 
-export const createUserController = async (req: Request, res: Response) => {
-	const { username, email, password, } = req.body;
-	const result = await createUser(username, email, password);
-	return res.status(200).json(result)
+export class UserController {
 
-};
-export const createGoogleUserController = async (req: Request, res: Response) => {
-	const { token } = req.body;
-	const result = await googleLogin(token)
-	return res.status(200).json(result)
-}
+	static createUser = async (req: Request, res: Response) => {
+		const { username, email, password, } = req.body;
+		const result = await UserServices.createUser(username, email, password);
+		return res.status(200).json(result)
 
-export const createMobileGoogleUserController = async (req: Request, res: Response) => {
-	const { email, client } = req.body;
-	if (client === "client0123") {
-		const result = await googleMobileLogin(email)
+	};
+	static createGoogleUser = async (req: Request, res: Response) => {
+		const { token } = req.body;
+		const result = await UserServices.googleLogin(token)
 		return res.status(200).json(result)
 	}
-	return res.status(200).json({ message: "invalid client id" })
-}
 
-export const loginUserController = async (req: Request, res: Response) => {
-	const { username, password } = req.body;
-	const result = await loginUser(username, password)
-	return res.status(200).json(result)
-};
+	static createMobileGoogleUser = async (req: Request, res: Response) => {
+		const { email, client } = req.body;
+		if (client === "client0123") {
+			const result = await UserServices.googleMobileLogin(email)
+			return res.status(200).json(result)
+		}
+		return res.status(200).json({ message: "invalid client id" })
+	}
+
+	static loginUser = async (req: Request, res: Response) => {
+		const { username, password } = req.body;
+		const result = await UserServices.loginUser(username, password)
+		return res.status(200).json(result)
+	};
+
+	static forgotPasswordSendRequest = async (req: Request, res: Response) => {
+		const { email } = req.body;
+		const token = await UserServices.setToken(email)
+		const html: string = EmailSender.getEmailVerificationHTML(token);
+		await EmailSender.sendMail("contact@renderverse.io", email, "Password Change", "", html.toString());
+		return HttpResponseFactory.CREATED({
+			data: { isEmailSend: true },
+			res: res
+		})
+	};
+
+	static validateToken = async (req: Request, res: Response) => {
+		const { token } = req.params;
+		const isVerified = await UserServices.isValidToken(token)
+		return HttpResponseFactory.OK({
+			data: { isVerified: isVerified },
+			res: res
+		})
+	}
+
+	static changePassword = async (req: Request, res: Response) => {
+		const { token } = req.params;
+		const { password } = req.body
+		const isVerified = await UserServices.isValidToken(token)
+		if (isVerified) {
+			const hash = await UserServices.hashPassword(password)
+			await UserServices.setPassword(token, hash)
+			await UserServices.clearToken(token)
+			return HttpResponseFactory.OK({ data: { isPasswordChanged: true }, res: res })
+		}
+		return HttpResponseFactory.OK({ data: { isPasswordChanged: false }, res: res })
+	}
+
+}

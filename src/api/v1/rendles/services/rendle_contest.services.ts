@@ -11,8 +11,6 @@ export class RendleContestServices {
 			const query: any = await RendleContest
 				.find().where({ isVisible: true }).populate("gameType").sort({ gameType: 1 })
 				.exec();
-			// const query = null;
-
 			const object = new DBObject(query)
 			const rendles = object.get();
 
