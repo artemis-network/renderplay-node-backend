@@ -1,9 +1,8 @@
-
 import bcrypt from 'bcrypt';
 import { logger } from '../../utils/logger';
 import { createToken } from '../../utils/token'
 import { OAuth2Client } from 'google-auth-library'
-import { generateJWTToken, decodeJWTToken } from '../../utils/jwt';
+import { JWT } from '../../utils/jwt';
 import { EmailSender } from '../../utils/email'
 import { GOOGLE_OAUTH_CLIENT } from '../../../../config'
 
@@ -27,6 +26,14 @@ export class UserServices {
 			$set: { token: token }
 		});
 		return token;
+	}
+
+	static updateToken = async (token: string) => {
+		const newToken = createToken();
+		await User.findOneAndUpdate({ token: token }, {
+			$set: { token: newToken }
+		});
+		return newToken;
 	}
 
 	static setIsVerified = async (token: string, isVerified: boolean) => {
@@ -74,7 +81,7 @@ export class UserServices {
 			await UserServices.createWalletForUser(newUser._id)
 			const html: string = EmailSender.getEmailVerificationHTML(token);
 			await EmailSender.sendMail(
-				"contact@renderverse.io", email, "Verify Email", "", html.toString()
+				"contact@renderverse.io", email, "Welcome to Renderplay, Please Verify Your Email", "", html.toString()
 			);
 			return { message: "Success", errorType: "NONE", error: false, status: 200 };
 		} catch (err: any) {
@@ -110,6 +117,7 @@ export class UserServices {
 				}
 				return response;
 			}
+
 			const token: string = generateJWTToken(username);
 
 			const result: Result = {

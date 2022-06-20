@@ -7,10 +7,11 @@ const ADMIN = {
 }
 
 const EMAIL_CONFIG = {
-	username: process.env.EMAIL_VERIFICATION_EMAIL || "",
-	password: process.env.EMAIL_VERIFICATION_PASSWORD || "",
+	username: process.env.EMAIL_AUTH_USER || "",
+	password: process.env.EMAIL_AUTH_PASSWORD || "",
 	port: process.env.EMAIL_VERIFICATION_EMAIL_PORT || 25,
-	host: process.env.EMAIL_VERIFICATION_HOST || ""
+	host: process.env.EMAIL_VERIFICATION_HOST || "",
+	email: process.env.EMAIL_VERIFICATION_EMAIL || "",
 }
 
 const JWT_SECRET = process.env.JWT_SECRET || ""
