@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { UserServices } from '../services/user.service'
-import { createToken } from '../../utils/token'
 import { EmailSender } from '../../utils/email'
 import { HttpResponseFactory } from '../../http/http_factory';
 
@@ -8,7 +7,7 @@ export class UserController {
 
 	static createUser = async (req: Request, res: Response) => {
 		const { username, email, password, } = req.body;
-		const result = await UserServices.createUser(username, email, password);
+		const result = await UserServices.createUser(username, email, password, false);
 		return res.status(200).json(result)
 
 	};

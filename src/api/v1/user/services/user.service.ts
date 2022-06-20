@@ -23,7 +23,7 @@ export class UserServices {
 
 	static setToken = async (email: string) => {
 		const token = createToken();
-		const user = await User.findOneAndUpdate({ email: email }, {
+		await User.findOneAndUpdate({ email: email }, {
 			$set: { token: token }
 		});
 		return token;
@@ -55,16 +55,14 @@ export class UserServices {
 	static createWalletForUser = async (user_id: string) =>
 		await UserWallet.create({ balance: 5000, isActive: true, user: user_id })
 
-	static createUser = async (username: string, email: string, password: string) => {
+	static createUser = async (username: string, email: string, password: string, isGoogleAccount: boolean) => {
 		try {
 			const token: string = createToken();
 			const hash = UserServices.hashPassword(password)
-
 			const newUser = await User.create({
 				username: username, email: email, password: hash, token: token,
 				isActivated: false, isGoogleAccount: false, isVerified: false,
 			});
-
 			await UserServices.createWalletForUser(newUser._id)
 			const html: string = EmailSender.getEmailVerificationHTML(token);
 			await EmailSender.sendMail(
@@ -86,7 +84,6 @@ export class UserServices {
 		try {
 			const user = await User.findOne({ $or: [{ username: username }, { email: username }] })
 			const authorized = bcrypt.compareSync(password, user?.password.toString() || "");
-
 			if (!authorized) {
 				const response: Result = {
 					message: "invalid username or password", status: 500,
@@ -130,16 +127,13 @@ export class UserServices {
 			const username = email.split("@")[0]
 			if (email_verified) {
 				try {
-					const newUser = await User.create({
-						username: username, email: email, password: "", isActivated: false,
-						isGoogleAccount: true, isVerified: false, token: ""
-					})
-					UserServices.createWalletForUser(newUser._id)
+					const { userId }: any = await UserServices.createUser(username, email, "", true)
+					UserServices.createWalletForUser(userId)
 					const token: string = generateJWTToken("username");
 					return {
-						error: false, userId: newUser._id, message: "SUCCESS",
-						username: newUser.username, errorType: "NONE",
-						email: newUser.email, accessToken: token,
+						error: false, userId: userId, message: "SUCCESS",
+						username: username, errorType: "NONE",
+						email: email, accessToken: token,
 						publicToken: "[ADMIN]", status: 200
 					};
 				} catch (err: any) {

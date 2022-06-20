@@ -13,7 +13,7 @@ const initUser = async () => {
 		const users = await (await User.find()).length
 		if (users <= 0) {
 			logger.info(">> create admin user")
-			const user: any = await UserServices.createUser(ADMIN.username, ADMIN.email, ADMIN.password)
+			const user: any = await UserServices.createUser(ADMIN.username, ADMIN.email, ADMIN.password, false)
 			const newUser = await User.findOne({ username: ADMIN.username })
 			const details = await depositFunds(newUser?._id, deposit)
 			console.log(details)
