@@ -13,9 +13,6 @@ export class EmailSender {
 			port: Number(EMAIL_CONFIG.port),
 			secure: false,
 			requireTLS: true,
-			tls: {
-				ciphers: 'SSLv3'
-			},
 			auth: {
 				user: EMAIL_CONFIG.username,
 				pass: EMAIL_CONFIG.password,
