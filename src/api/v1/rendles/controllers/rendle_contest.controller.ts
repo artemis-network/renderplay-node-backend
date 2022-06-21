@@ -180,4 +180,13 @@ export class RendleContestController {
 			return HttpResponseFactory.OK({ data: response, res: res })
 		}
 	}
+
+	static getContestSolution = async (req: Request, res: Response) => {
+		const { contestId } = req.body
+
+		const gameType: any = await (await RendleContestServices.getGameTypeFromContest(contestId)).gameType;
+		const winningWord = await RendleContestServices.getWinningWord(contestId,gameType)
+		console.log(winningWord)
+		return HttpResponseFactory.OK({ data: {solution: winningWord}, res: res })
+	}
 }

@@ -15,6 +15,7 @@ const router = express.Router();
 router.post(`${rendlesPrefix}/init`, adminAuthenticatorMiddleWare, rendlesInit);
 router.post(`${rendlesPrefix}/destroy`, adminAuthenticatorMiddleWare, destoryRendle);
 router.post(`${rendlesPrefix}/reset`, adminAuthenticatorMiddleWare, RendleResetController.resetContests);
+router.post(`${rendlesPrefix}/getanswer`, adminAuthenticatorMiddleWare, RendleContestController.getContestSolution);
 
 router.get(rendlesPrefix, RendleContestController.getContests);
 
