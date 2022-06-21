@@ -207,27 +207,58 @@ export class RendleContestServices {
 		}
 	}
 
+	static unicodeSplit = (word: string) => {
+		const letters = []
+		for (let i = 0; i < word.length; i++) letters[i] = word[i]
+		return letters
+	  }
+
 	static getGuessStatuses = async (gameType: number, contestId: string, guess: string) => {
 		const solution: any = await this.getWinningWord(contestId, gameType)
-		const guessStatus = []
-		var isWinningWord: boolean = true
-		console.log("solution - " + solution)
-		for (let i = 0; i < guess.length; i++) {
-			if (guess[i].toLowerCase() === solution[i]) {
-				console.log('yes')
-				guessStatus.push("correct")
-			} else {
-				console.log('no')
-				isWinningWord = false;
-				guessStatus.push(await this.isLetterInWord(solution, guess[i]))
+		const splitSolution = RendleContestServices.unicodeSplit(solution)
+  		const splitGuess = RendleContestServices.unicodeSplit(guess)
+
+  		const solutionCharsTaken = splitSolution.map((_) => false)
+  		const statuses = Array.from(Array(guess.length))
+
+		//handling all correct cases first
+		splitGuess.forEach((letter, i) => {
+			if (letter.toLowerCase() === splitSolution[i]) {
+			  statuses[i] = 'correct'
+			  solutionCharsTaken[i] = true
+			  return
 			}
-		}
-		return { guessStatus: guessStatus, isWinningWord: isWinningWord }
+		  })
+
+		splitGuess.forEach((letter, i) => {
+			if (statuses[i]) return
+			if (!splitSolution.includes(letter.toLowerCase())) {
+			  statuses[i] = 'absent'
+			  return
+			}
+			// now we are left with "present"s
+			const indexOfPresentChar = splitSolution.findIndex(
+			  (x, index) => x === letter.toLowerCase() && !solutionCharsTaken[index]
+			)
+			if (indexOfPresentChar > -1) {
+			  statuses[i] = 'present'
+			  solutionCharsTaken[indexOfPresentChar] = true
+			  return
+			} else {
+			  statuses[i] = 'absent'
+			  return
+			}
+		  })
+		
+		  return { guessStatus: statuses, isWinningWord: guess.toLowerCase() == solution } 
 	}
 
-	static isLetterInWord(solution: string, letter: string) {
+	static isLetterInWord(solution: string, letter: string, solutionCharsTaken: Array<boolean>) {
 		for (let i = 0; i < solution.length; i++)
-			if (solution[i] === letter.toLowerCase()) return "present"
+			if (solution[i] === letter.toLowerCase() && !solutionCharsTaken[i]) {
+				return "present"
+				solutionCharsTaken[i] == true
+			}
 		return "absent"
 	}
 

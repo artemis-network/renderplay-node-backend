@@ -63,7 +63,7 @@ export class UserController {
 				const { _id }: any = await UserServices.createUser(username, email, "", "", true)
 				UserServices.createWalletForUser(_id)
 				const token: string = JWT.generateJWTToken(_id);
-				return { error: false, errorType: "NONE", accessToken: token, };
+				return { error: false, errorType: "NONE", username: username, accessToken: token, };
 			} catch (err) {
 				return HttpResponseFactory.INTERNAL_SERVER_ERROR({ data: { message: err }, res: res })
 			}
