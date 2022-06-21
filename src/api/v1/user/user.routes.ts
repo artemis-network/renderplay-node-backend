@@ -30,7 +30,7 @@ router.get(`${userPrefix}/test-token`, authorizeUserMiddleWare, (req, res) => re
 router.post(`${userPrefix}/users/activate-user`, checkForAccountActivationController)
 router.post(`${userPrefix}/users/verify-user`, verifyUserEmailController)
 
-router.post(`${walletPrefix}`, WalletController.getWalletController)
-router.post(`${walletPrefix}/deposit`, WalletController.depositFundsController)
+router.post(`${walletPrefix}`,authorizeUserMiddleWare, WalletController.getWalletController)
+router.post(`${walletPrefix}/deposit`,authorizeUserMiddleWare, WalletController.depositFundsController)
 
 export { router as userRoutes }

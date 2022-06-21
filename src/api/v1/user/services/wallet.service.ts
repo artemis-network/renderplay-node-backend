@@ -7,8 +7,11 @@ interface Result { error?: boolean, message?: string; balance?: number; }
 export class WalletServices {
 
 	static getWallet = async (userId: string): Promise<Result> => {
-		const wallet = await UserWallet.findOne({ user: userId })
-		return { error: false, message: "ok", balance: wallet?.balance }
+		if (userId) {
+			const wallet = await UserWallet.findOne({ user: userId })
+			return { error: false, message: "ok", balance: wallet?.balance }
+		}
+		return { error: true, message: "userid undefined", balance: 0 }
 	}
 
 	static depositFunds = async (userId: string, amount: number): Promise<Result> => {

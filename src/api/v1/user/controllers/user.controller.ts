@@ -118,7 +118,7 @@ export class UserController {
 			}
 
 			const token: string = JWT.generateJWTToken(user?._id);
-			const response = { error: false, accessToken: token, errorType: 'NONE' }
+			const response = { error: false, accessToken: token, username: username, errorType: 'NONE' }
 			return HttpResponseFactory.OK({ data: { ...response }, res: res })
 		} catch (err: any) {
 			if (err.name === ErrorTypes.OBJECT_NOT_FOUND_ERROR) {

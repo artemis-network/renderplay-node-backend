@@ -8,6 +8,7 @@ import { fiveLetterGuesses } from '../config/fiveLetterGuesses'
 import { sixLetterGuesses } from '../config/sixLetterGuesses'
 import { sevenLetterGuesses } from '../config/sevenLetterGuesses'
 import { RendleGameState } from '../models/rendle_game_state.model'
+import { rendleImages } from '../data/rendleImageUrls'
 
 const { RendleContest, RendleResult, RendleContestant } = db;
 
@@ -30,9 +31,10 @@ export class RendleContestServices {
 				const entryFee = rendles[i].entryFee
 				const expiresAt = rendles[i].expiresAt
 				const isExpired = rendles[i].isExpired
+				const images = rendleImages[i]
 				serializedRendles.push({
 					_id: id, gameType: gameType, startsOn: startsOn, entryFee: entryFee,
-					expiresAt: expiresAt, isExpired: isExpired
+					expiresAt: expiresAt, isExpired: isExpired, rendleImages: images
 				})
 			}
 			return { currentTime: new Date(), rendleContests: serializedRendles }
