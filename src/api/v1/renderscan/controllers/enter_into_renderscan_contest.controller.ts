@@ -6,7 +6,7 @@ import {
 
 import { createRenderscanGameStateForUser, getFirstQuestionOpensAt } from '../services/renderscan_quiz.services'
 
-import { deductFunds, getBalance } from '../../user/services/wallet.service'
+import { WalletServices } from '../../user/services/wallet.service'
 
 enum RenderScanContestState {
 	INSUFFICENT_FUNDS = "[INSUFFICENT_FUNDS]", APPROVED = "[APPROVED]",
@@ -28,7 +28,7 @@ export const enterIntoRenderScanContestController = async (req: Request, res: Re
 	}
 
 	const gameEntryFee: any = await getRenderscanGameTypeFee(contestId);
-	const balance: any = await getBalance(userId);
+	const balance: any = await WalletServices.getBalance(userId);
 	if (gameEntryFee > balance) return res.status(200).json({
 		message: "insufficent funds", status: RenderScanContestState.INSUFFICENT_FUNDS
 	})
@@ -37,7 +37,7 @@ export const enterIntoRenderScanContestController = async (req: Request, res: Re
 		message: "approved", status: RenderScanContestState.APPROVED, approved: true
 	})
 
-	await deductFunds(userId, gameEntryFee)
+	await WalletServices.deductFunds(userId, gameEntryFee)
 	await addUserToRenderScanContest(contestId, userId, gameEntryFee, walletAddress);
 	const firstQuestionOpensAt: any = await getFirstQuestionOpensAt(contestId);
 	await createRenderscanGameStateForUser(userId, contestId, firstQuestionOpensAt)

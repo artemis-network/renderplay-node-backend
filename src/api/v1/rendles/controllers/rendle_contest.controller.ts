@@ -2,9 +2,8 @@ import { Request, Response } from 'express';
 
 import { RendleContestServices } from '../services/rendle_contest.services'
 import { RendleGameStateServices } from '../services/rendle_game_state.services'
-import { deductFunds, getBalance } from '../../user/services/wallet.service'
+import { WalletServices } from '../../user/services/wallet.service'
 import { HttpResponseFactory } from '../../http/http_factory'
-import { JWT } from '../../utils/jwt';
 
 enum RendleContestState {
 	INSUFFICENT_FUNDS = "[INSUFFICENT_FUNDS]", APPROVED = "[APPROVED]",
@@ -45,7 +44,7 @@ export class RendleContestController {
 			})
 
 		const gameEntryFee: any = await RendleContestServices.getContestEntryFee(contestId);
-		const balance: any = await getBalance(userId);
+		const balance: any = await WalletServices.getBalance(userId);
 
 		if (gameEntryFee > balance)
 			return HttpResponseFactory.OK({
@@ -61,7 +60,7 @@ export class RendleContestController {
 				}, res: res
 			})
 
-		await deductFunds(userId, gameEntryFee)
+		await WalletServices.deductFunds(userId, gameEntryFee)
 		await RendleContestServices.addUserToContest(userId, contestId, walletAddress, gameEntryFee);
 		const gameState = await RendleGameStateServices.createGameStateForUser(userId, contestId)
 
@@ -149,12 +148,12 @@ export class RendleContestController {
 			}
 
 			return HttpResponseFactory.OK({ data: response, res: res })
-		}
-
-		else {
+		} else {
 			const response = { isValidGameEntry: false, currentTime: currTime }
 			return HttpResponseFactory.OK({ data: response, res: res });
 		}
+		const response = { isValidGameEntry: false, currentTime: currTime }
+		return HttpResponseFactory.OK({ data: response, res: res });
 	}
 
 	// @desc get status of current contest
@@ -176,14 +175,9 @@ export class RendleContestController {
 			const response = { isValidGuess: isValidGuess, isWinningWord: isWinningWord, guessStatus: guessStatus, ...gameStateId }
 
 			return HttpResponseFactory.OK({ data: response, res: res })
-		}
-		else {
+		} else {
 			const response = { isValidGuess: isValidGuess }
 			return HttpResponseFactory.OK({ data: response, res: res })
 		}
-
-
 	}
-
-
 }
