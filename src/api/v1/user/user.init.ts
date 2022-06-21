@@ -1,5 +1,5 @@
 import { db } from '../db'
-import { UserServices } from '../user/services/user.service'
+import { UserServices, Role } from '../user/services/user.service'
 import { depositFunds } from '../user/services/wallet.service';
 import { logger } from '../utils/logger';
 
@@ -13,7 +13,7 @@ const initUser = async () => {
 		const users = await (await User.find()).length
 		if (users <= 0) {
 			logger.info(">> create admin user")
-			const user: any = await UserServices.createUser(ADMIN.username, ADMIN.email, ADMIN.password, false)
+			const user: any = await UserServices.createUser(ADMIN.username, ADMIN.email, ADMIN.password, Role.ADMIN, false)
 			const newUser = await User.findOne({ username: ADMIN.username })
 			const details = await depositFunds(newUser?._id, deposit)
 			console.log(details)

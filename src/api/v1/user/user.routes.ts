@@ -28,7 +28,10 @@ router.post(`${userPrefix}/validate/:token`, UserController.validateToken)
 router.post(`${userPrefix}/forgot-password/request`, UserController.forgotPasswordSendRequest)
 router.post(`${userPrefix}/change-password/:token`, UserController.changePassword)
 
-router.get(`${userPrefix}/test-token`, authorizeUserMiddleWare, (req, res) => res.send("hello"));
+router.get(`${userPrefix}/test-token`, authorizeUserMiddleWare, (req, res) => {
+	console.log(req.body)
+	res.send("hello")
+});
 
 router.post(`${userPrefix}/users/activate-user`, checkForAccountActivationController)
 router.post(`${userPrefix}/users/verify-user`, verifyUserEmailController)

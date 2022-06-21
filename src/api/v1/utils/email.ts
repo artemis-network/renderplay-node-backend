@@ -1,7 +1,8 @@
 import nodemailer from 'nodemailer';
 import { EMAIL_CONFIG } from '../../../config'
-import { userPrefix } from '../config'
-import { verificationHtml, forgotPasswordHtml } from './verificationHtml';
+
+import { verificationHtml, forgotPasswordHtml } from './verification_htmls';
+
 export class EmailSender {
 
 	static getTransporter() {
@@ -9,7 +10,7 @@ export class EmailSender {
 			host: EMAIL_CONFIG.host,
 			port: Number(EMAIL_CONFIG.port),
 			secure: false,
-			requireTLS : true,
+			requireTLS: true,
 			tls: {
 				ciphers: 'SSLv3'
 			},
@@ -29,14 +30,14 @@ export class EmailSender {
 			html: html, // html body
 		});
 	}
-		
+
 	static getEmailVerificationHTML(token: string): string {
-		const url:string = `https://play.renderverse.io/verify/${token}`
+		const url: string = `https://play.renderverse.io/verify/${token}`
 		return verificationHtml(url);
 	}
 
 	static getForgotPasswordHTML(token: string): string {
-		const url:string = `https://play.renderverse.io/change-password/${token}`
+		const url: string = `https://play.renderverse.io/change-password/${token}`
 		return forgotPasswordHtml(url);
 	}
 }

@@ -1,27 +1,35 @@
 import bcrypt from 'bcrypt';
 import { logger } from '../../utils/logger';
-import { createToken } from '../../utils/token'
 import { OAuth2Client } from 'google-auth-library'
 import { JWT } from '../../utils/jwt';
 import { EmailSender } from '../../utils/email'
 import { GOOGLE_OAUTH_CLIENT } from '../../../../config'
 
+import crypto from 'crypto';
+
 const client: any = new OAuth2Client(GOOGLE_OAUTH_CLIENT)
 
 import { db } from '../../db'
+import { DBObject } from '../../db_object';
+import { Error } from 'mongoose';
+import { DBErrors, ErrorTypes } from '../../errors/db.errors';
 
 const { User, UserWallet } = db;
 
-
-interface Result {
-	message: string; error: boolean; errorType: string, status: number, userId?: string,
-	username?: string, email?: string, accessToken?: string, publicToken?: string
-}
+export enum Role { ADMIN = "ADMIN", USER = "USER", GUEST = "GUEST" }
 
 export class UserServices {
 
+	static createToken = (): string => {
+		try {
+			return crypto.randomBytes(32).toString("hex")
+		} catch (e) {
+			throw new Error("Error");
+		}
+	}
+
 	static setToken = async (email: string) => {
-		const token = createToken();
+		const token = UserServices.createToken();
 		await User.findOneAndUpdate({ email: email }, {
 			$set: { token: token }
 		});
@@ -29,7 +37,7 @@ export class UserServices {
 	}
 
 	static updateToken = async (token: string) => {
-		const newToken = createToken();
+		const newToken = UserServices.createToken();
 		await User.findOneAndUpdate({ token: token }, {
 			$set: { token: newToken }
 		});
@@ -70,84 +78,57 @@ export class UserServices {
 	static createWalletForUser = async (user_id: string) =>
 		await UserWallet.create({ balance: 5000, isActive: true, user: user_id })
 
-	static createUser = async (username: string, email: string, password: string, isGoogleAccount: boolean) => {
+	static isUserAlreadyExists = async (username: string, email: string) => {
+		const query = await User.findOne({ $or: [{ username: username }, { email: email }] })
 		try {
-			const token: string = createToken();
-			const hash = await UserServices.hashPassword(password)
-			const newUser = await User.create({
-				username: username, email: email, password: hash, token: token,
-				isActivated: false, isGoogleAccount: false, isVerified: false,
-			});
-			await UserServices.createWalletForUser(newUser._id)
-			const html: string = EmailSender.getEmailVerificationHTML(token);
-			await EmailSender.sendMail(
-				"contact@renderverse.io", email, "Welcome to Renderplay, Please Verify Your Email", "", html.toString()
-			);
-			return { message: "Success", errorType: "NONE", error: false, status: 200 };
+			const user = new DBObject(query)
+			await user.get()
+			return true;
 		} catch (err: any) {
-			logger.error(err);
-			if (err.code === 11000) {
-				return {
-					message: "username or email already in use", errorType: "USER_ALREADY_EXIST",
-					error: true, status: 500
-				}
-			}
+			if (
+				err.name === ErrorTypes.OBJECT_NOT_FOUND_ERROR ||
+				err.name === ErrorTypes.OBJECT_UN_DEFINED_ERROR
+			)
+				return false
+			return true
 		}
 	}
 
-	static loginUser = async (username: string, password: string) => {
+	static createUser = async (username: string, email: string, hash: string, token: string, isGoogleAccount: boolean) => {
+		return await User.create({
+			username: username, email: email, password: hash, token: token,
+			isActivated: false, isGoogleAccount: isGoogleAccount, isVerified: false,
+			userType: Role.USER.toString()
+		});
+	}
+
+	static authenticateUser = async (username: string) => {
 		try {
-			const user = await User.findOne({ $or: [{ username: username }, { email: username }] })
-			const authorized = bcrypt.compareSync(password, user?.password.toString() || "");
-			if (!authorized) {
-				const response: Result = {
-					message: "invalid username or password", status: 500,
-					errorType: "INVALID_CRENDENTAILS", error: true
-				}
-				return response;
-			}
-
-			if (!user?.isVerified) {
-				logger.info(">> user email not verified " + " >> ");
-				const response: Result = {
-					error: true,
-					message: "verify email, to login",
-					errorType: "UNAUTHORIZED_EMAIL",
-					status: 401
-				}
-				return response;
-			}
-
-			const token: string = generateJWTToken(username);
-
-			const result: Result = {
-				error: false, message: "SUCCESS", userId: user?._id, username: user?.username,
-				email: user?.email, accessToken: token, publicToken: "[ADMIN]", errorType: 'NONE',
-				status: 0
-			}
-			return result
-		} catch (err) {
-			logger.error(err);
-			const response: Result = {
-				errorType: "INVALID_CREDENTIALS", message: "Username/Email does not exists",
-				status: 500, error: true
-			}
-			return response;
+			const query = await User.findOne({ $or: [{ username: username }, { email: username }] })
+			const user = new DBObject(query)
+			return user.get()
+		} catch (err: any) {
+			throw new Error(err)
 		}
 	}
+
+	static verifyPassword = async (password: string, hash: string) => bcrypt.compareSync(password, hash);
+
 
 	static googleLogin = async (googleToken: string) => {
 		try {
+
 			const { payload } = await client.verifyIdToken({ idToken: googleToken, audience: GOOGLE_OAUTH_CLIENT })
 			const { email, email_verified } = payload
 			const username = email.split("@")[0]
+
 			if (email_verified) {
 				try {
-					const { userId }: any = await UserServices.createUser(username, email, "", true)
-					UserServices.createWalletForUser(userId)
-					const token: string = generateJWTToken("username");
+					const { _id }: any = await UserServices.createUser(username, email, "", "", true)
+					UserServices.createWalletForUser(_id)
+					const token: string = JWT.generateJWTToken("username");
 					return {
-						error: false, userId: userId, message: "SUCCESS",
+						error: false, userId: _id, message: "SUCCESS",
 						username: username, errorType: "NONE",
 						email: email, accessToken: token,
 						publicToken: "[ADMIN]", status: 200
@@ -156,7 +137,7 @@ export class UserServices {
 					console.log(err)
 					if (err["code"] === 11000) {
 						const user = await User.findOne({ email: email })
-						const token: string = generateJWTToken(username);
+						const token: string = JWT.generateJWTToken(username);
 						return {
 							error: false, userId: user?._id, message: "SUCCESS",
 							username: username, email: email, accessToken: token,
@@ -174,7 +155,7 @@ export class UserServices {
 
 	}
 
-	static googleMobileLogin = async (email: string): Promise<Result | undefined> => {
+	static googleMobileLogin = async (email: string) => {
 		try {
 			const username = email.split("@")[0]
 			try {
@@ -183,7 +164,7 @@ export class UserServices {
 					isActivated: false, isGoogleAccount: true, isVerified: false,
 				})
 				UserServices.createWalletForUser(newUser._id)
-				const token: string = generateJWTToken("username");
+				const token: string = JWT.generateJWTToken(newUser._id);
 				return {
 					error: false, userId: newUser._id, message: "SUCCESS",
 					username: newUser.username, errorType: "NONE", email: newUser.email,
@@ -193,7 +174,7 @@ export class UserServices {
 				console.log(err)
 				if (err["code"] === 11000) {
 					const user = await User.findOne({ email: email })
-					const token: string = generateJWTToken(username);
+					const token: string = JWT.generateJWTToken(user?._id);
 					return {
 						error: false, userId: user?._id, message: "SUCCESS",
 						username: username, email: email, accessToken: token,
