@@ -9,7 +9,7 @@ const ADMIN = {
 const EMAIL_CONFIG = {
 	username: process.env.EMAIL_AUTH_USER || "",
 	password: process.env.EMAIL_AUTH_PASSWORD || "",
-	port: process.env.EMAIL_VERIFICATION_EMAIL_PORT || 25,
+	port: process.env.EMAIL_VERIFICATION_PORT || 25,
 	host: process.env.EMAIL_VERIFICATION_HOST || "",
 	email: process.env.EMAIL_VERIFICATION_EMAIL || "",
 }
