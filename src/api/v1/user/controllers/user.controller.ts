@@ -17,7 +17,7 @@ export class UserController {
 			const isExists = await UserServices.isUserAlreadyExists(username, email)
 			if (isExists) {
 				const response = {
-					errorType: "USER_ALREADY_EXIST", message: "username or email already in use",
+					errorType: "USER_ALREADY_EXIST", message: "Username or Email already in use",
 					error: true,
 				}
 				return HttpResponseFactory.OK({ data: { ...response }, res: res })
@@ -47,22 +47,22 @@ export class UserController {
 			try {
 				const isExists = await UserServices.isUserAlreadyExists(username, email)
 				if (isExists) {
-
 					const user = await UserServices.getUserByEmail(email)
 					if (user?.isGoogleAccount === false) {
 						const response = {
-							error: true, message: "It's not a google account, signin with email & password", errorType: "UNAUTHORIZED_ACCESS"
+							error: true, message: "It's not a google account, SignIn with Email & Password", errorType: "UNAUTHORIZED_ACCESS"
 						}
 						return HttpResponseFactory.OK({ data: { ...response }, res: res })
 					}
 
 					const token: string = JWT.generateJWTToken(user?._id);
-					const response = { error: false, errorType: "NONE", accessToken: token }
+					const response = { error: false, errorType: "NONE", username: username, accessToken: token }
 					return HttpResponseFactory.OK({ data: { ...response }, res: res })
 				}
 				const { _id }: any = await UserServices.createUser(username, email, "", "", true)
 				UserServices.createWalletForUser(_id)
 				const token: string = JWT.generateJWTToken(_id);
+				console.log(username)
 				return { error: false, errorType: "NONE", username: username, accessToken: token, };
 			} catch (err) {
 				return HttpResponseFactory.INTERNAL_SERVER_ERROR({ data: { message: err }, res: res })
