@@ -26,8 +26,10 @@ export class UserController {
 			const hash = await UserServices.hashPassword(password)
 			const newUser = await UserServices.createUser(username, email, hash, token, false);
 			await UserServices.createWalletForUser(newUser?._id)
-			const html = EmailSender.getEmailVerificationHTML(token);
+			const html: string = EmailSender.getEmailVerificationHTML(token);
+			console.log("sending verification email to - " + email)
 			await EmailSender.sendMail("contact@renderverse.io", email, "Welcome to Renderplay, Please Verify Your Email", "", html.toString());
+			console.log("sent verification email")
 			const response = { message: "Successfully created", errorType: "NONE", error: false };
 			return HttpResponseFactory.OK({ data: { ...response }, res: res })
 		} catch (err) {
@@ -138,7 +140,9 @@ export class UserController {
 			const { email } = req.body;
 			const token = await UserServices.setToken(email)
 			const html: string = EmailSender.getForgotPasswordHTML(token);
+			console.log("sending forgot password email to - " + email)
 			await EmailSender.sendMail("contact@renderverse.io", email, "Password Change", "", html.toString());
+			console.log("sent forgot password email")
 			return HttpResponseFactory.CREATED({ data: { isEmailSend: true }, res: res })
 		} catch (err) {
 			return HttpResponseFactory.INTERNAL_SERVER_ERROR({ data: { isEmailSend: false, message: "user does not exists" }, res: res })
