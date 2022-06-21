@@ -7,6 +7,7 @@ import { ErrorTypes } from '../../errors/db.errors';
 
 export class UserController {
 
+
 	// @desc creating new user
 	// @route /backend/v1/users/register
 	// @access public
@@ -25,7 +26,7 @@ export class UserController {
 			const hash = await UserServices.hashPassword(password)
 			const newUser = await UserServices.createUser(username, email, hash, token, false);
 			await UserServices.createWalletForUser(newUser?._id)
-			const html: string = EmailSender.getEmailVerificationHTML(token);
+			const html = EmailSender.getEmailVerificationHTML(token);
 			await EmailSender.sendMail("contact@renderverse.io", email, "Welcome to Renderplay, Please Verify Your Email", "", html.toString());
 			const response = { message: "Successfully created", errorType: "NONE", error: false };
 			return HttpResponseFactory.OK({ data: { ...response }, res: res })
