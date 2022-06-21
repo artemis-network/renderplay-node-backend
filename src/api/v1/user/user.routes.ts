@@ -6,12 +6,9 @@ const router = express.Router();
 import { authorizeUserMiddleWare } from '../middlewares/jwtTokenAuthenticator.middleware';
 
 // controllers
-import { getWalletController } from './controllers/wallet.controller';
 import { checkForAccountActivationController, verifyUserEmailController } from './controllers/verification.controller';
 import { UserController } from './controllers/user.controller'
-
-
-import { depositFundsController } from './controllers/wallet.controller'
+import { WalletController } from './controllers/wallet.controller'
 
 import { userPrefix, walletPrefix } from '../config'
 import { userInitController } from './controllers/user_init.controller';
@@ -28,15 +25,12 @@ router.post(`${userPrefix}/validate/:token`, UserController.validateToken)
 router.post(`${userPrefix}/forgot-password/request`, UserController.forgotPasswordSendRequest)
 router.post(`${userPrefix}/change-password/:token`, UserController.changePassword)
 
-router.get(`${userPrefix}/test-token`, authorizeUserMiddleWare, (req, res) => {
-	console.log(req.body)
-	res.send("hello")
-});
+router.get(`${userPrefix}/test-token`, authorizeUserMiddleWare, (req, res) => res.send("hello"));
 
 router.post(`${userPrefix}/users/activate-user`, checkForAccountActivationController)
 router.post(`${userPrefix}/users/verify-user`, verifyUserEmailController)
 
-router.post(`${walletPrefix}`, getWalletController)
-router.post(`${walletPrefix}/deposit`, depositFundsController)
+router.post(`${walletPrefix}`, WalletController.getWalletController)
+router.post(`${walletPrefix}/deposit`, WalletController.depositFundsController)
 
 export { router as userRoutes }
