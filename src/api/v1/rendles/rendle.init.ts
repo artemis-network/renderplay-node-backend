@@ -53,13 +53,15 @@ function getCurrentIndianDateTime() {
 const gameTypeExpiryStatus: gameTypeExpiryStatus = {
 	5: false,
 	6: false,
-	7: true
+	// change it true later 
+	7: false,
 }
 
 const gameTypeStartsOn: gameTypeStartsOn = {
 	5: getCurrentIndianDateTime(),
 	6: new Date((getCurrentIndianDateTime().getTime() + 4 * 60 * 60 * 1000)),
-	7: new Date(0)
+	// change it to new Date(0)
+	7: getCurrentIndianDateTime()
 }
 
 const addTimeToDate = (date: Date, timeInMilliseconds: number): Date => new Date(date.getTime() + timeInMilliseconds)
