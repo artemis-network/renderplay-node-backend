@@ -69,9 +69,12 @@ const createRendleContest = async (gameType: number, entryFee: number, gameTypeI
 		logger.info(`>> creating new contest for Rendle ${gameType} with StartsOn ${gameTypeStartsOn[gameType]}`)
 
 		const fiveMinutes = 1000 * 60 * 5
+		const thirtyDays = 1000 * 60 * 60 * 24 * 30
 
 		const opensAt = addTimeToDate(gameTypeStartsOn[gameType], fiveMinutes);
-		const expiresAt = addTimeToDate(opensAt, fiveMinutes * 2)
+
+		// later change thirty days to fifteen minutes
+		const expiresAt = addTimeToDate(opensAt, thirtyDays)
 
 		const input: RendleContestInput = {
 			entryFee: entryFee,

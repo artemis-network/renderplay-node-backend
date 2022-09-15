@@ -7,6 +7,10 @@ interface RendleGameType {
 const rendleGameTypes: Array<RendleGameType> = [
 	{
 		gameType: 5,
+		entryFee: 0
+	},
+	{
+		gameType: 5,
 		entryFee: 1000
 	},
 	{

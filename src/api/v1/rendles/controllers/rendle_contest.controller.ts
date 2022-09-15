@@ -24,7 +24,8 @@ export class RendleContestController {
 			return HttpResponseFactory.OK({ data: { isContestOpened: false }, res: res })
 
 		const isInContest = await RendleContestServices.doesUserAlreadyInContest(userId, contestId);
-		const isLobbyClosed = await RendleContestServices.isLobbyClosed(contestId)
+		// later uncomment this code
+		// const isLobbyClosed = await RendleContestServices.isLobbyClosed(contestId)
 		if (isInContest) {
 			const gameStateId = await RendleGameStateServices.getGameStateIdByUserId(userId)
 			return HttpResponseFactory.OK({
@@ -35,13 +36,13 @@ export class RendleContestController {
 				}, res: res
 			})
 		}
-
-		if (isLobbyClosed)
-			return HttpResponseFactory.OK({
-				data: {
-					isLobbyClosed: isLobbyClosed
-				}, res: res
-			})
+		// later uncomment this code
+		// if (isLobbyClosed)
+		// 	return HttpResponseFactory.OK({
+		// 		data: {
+		// 			isLobbyClosed: isLobbyClosed
+		// 		}, res: res
+		// 	})
 
 		const gameEntryFee: any = await RendleContestServices.getContestEntryFee(contestId);
 		const balance: any = await WalletServices.getBalance(userId);
@@ -185,8 +186,9 @@ export class RendleContestController {
 		const { contestId } = req.body
 
 		const gameType: any = await (await RendleContestServices.getGameTypeFromContest(contestId)).gameType;
-		const winningWord = await RendleContestServices.getWinningWord(contestId,gameType)
+		const winningWord = await RendleContestServices.getWinningWord(contestId, gameType)
 		console.log(winningWord)
-		return HttpResponseFactory.OK({ data: {solution: winningWord}, res: res })
+		return HttpResponseFactory.OK({ data: { solution: winningWord }, res: res })
 	}
+
 }
