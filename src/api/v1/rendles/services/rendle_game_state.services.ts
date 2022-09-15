@@ -72,17 +72,29 @@ export class RendleGameStateServices {
 	}
 
 
+	static isUserHavingGameState = async (userId: string, contestId: string) => {
+		const gameState = await RendleGameState.findOne({ userId: userId })
+		if (gameState != null) {
+			const inGame = await RendleGameState.findOne({ userId: userId }).where({ contestId: contestId })
+			if (inGame != null) {
+				return false;
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
 
-	static isIndexAlreadyInGameState = async (userId:string, index: number, gameType: number) => {
+	static isIndexAlreadyInGameState = async (userId: string, index: number, gameType: number) => {
 		const gameState: any = await RendleGameState
-				.findOne({ userId: userId }).populate('words').exec()
+			.findOne({ userId: userId }).populate('words').exec()
 		const len = await gameState?.words.length;
-		if(index <= len){
+		if (index <= len) {
 			// wrong entry
 			return true;
 		}
-		else{
-			if(index > gameType){
+		else {
+			if (index > gameType) {
 				//wrong entry
 				return true
 			}

@@ -8,6 +8,8 @@ import { HttpResponseFactory } from '../../http/http_factory'
 enum RendleContestState {
 	INSUFFICENT_FUNDS = "[INSUFFICENT_FUNDS]", APPROVED = "[APPROVED]",
 	ALREADY_IN_CONTEST = "[ALREADY_IN_CONTEST]",
+	// can remove this below code later
+	USER_HAS_GAME_STATE = "[USER_HAS_GAME_STATE]"
 }
 
 export class RendleContestController {
@@ -23,9 +25,19 @@ export class RendleContestController {
 		if (!isContestOpened)
 			return HttpResponseFactory.OK({ data: { isContestOpened: false }, res: res })
 
+		// remove below block of code later
+		const hasAlreadyGameState = await RendleGameStateServices.isUserHavingGameState(userId, contestId);
+		if (hasAlreadyGameState) {
+			return HttpResponseFactory.OK({
+				data: {
+					message: "has game state",
+					status: RendleContestState.USER_HAS_GAME_STATE,
+				}, res: res
+			})
+		}
+		// till here remove
+
 		const isInContest = await RendleContestServices.doesUserAlreadyInContest(userId, contestId);
-		// later uncomment this code
-		// const isLobbyClosed = await RendleContestServices.isLobbyClosed(contestId)
 		if (isInContest) {
 			const gameStateId = await RendleGameStateServices.getGameStateIdByUserId(userId)
 			return HttpResponseFactory.OK({
@@ -36,7 +48,9 @@ export class RendleContestController {
 				}, res: res
 			})
 		}
+
 		// later uncomment this code
+		// const isLobbyClosed = await RendleContestServices.isLobbyClosed(contestId)
 		// if (isLobbyClosed)
 		// 	return HttpResponseFactory.OK({
 		// 		data: {

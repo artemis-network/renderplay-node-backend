@@ -67,6 +67,12 @@ export class RendleContestServices {
 		if (isContestOpened > 0) return true
 		return false
 	}
+
+	static getContestGameType = async (contestId: string) => {
+		const contest = await RendleContest.findById(contestId)
+		return contest?.gameType;
+	}
+
 	static isLobbyClosed = async (contestId: string) => {
 		const contest: any = await RendleContest.findById(contestId)
 		const lobbyTime = new Date(contest?.opensAt).getTime()
@@ -211,46 +217,46 @@ export class RendleContestServices {
 		const letters = []
 		for (let i = 0; i < word.length; i++) letters[i] = word[i]
 		return letters
-	  }
+	}
 
 	static getGuessStatuses = async (gameType: number, contestId: string, guess: string) => {
 		const solution: any = await this.getWinningWord(contestId, gameType)
 		const splitSolution = RendleContestServices.unicodeSplit(solution)
-  		const splitGuess = RendleContestServices.unicodeSplit(guess)
+		const splitGuess = RendleContestServices.unicodeSplit(guess)
 
-  		const solutionCharsTaken = splitSolution.map((_) => false)
-  		const statuses = Array.from(Array(guess.length))
+		const solutionCharsTaken = splitSolution.map((_) => false)
+		const statuses = Array.from(Array(guess.length))
 
 		//handling all correct cases first
 		splitGuess.forEach((letter, i) => {
 			if (letter.toLowerCase() === splitSolution[i]) {
-			  statuses[i] = 'correct'
-			  solutionCharsTaken[i] = true
-			  return
+				statuses[i] = 'correct'
+				solutionCharsTaken[i] = true
+				return
 			}
-		  })
+		})
 
 		splitGuess.forEach((letter, i) => {
 			if (statuses[i]) return
 			if (!splitSolution.includes(letter.toLowerCase())) {
-			  statuses[i] = 'absent'
-			  return
+				statuses[i] = 'absent'
+				return
 			}
 			// now we are left with "present"s
 			const indexOfPresentChar = splitSolution.findIndex(
-			  (x, index) => x === letter.toLowerCase() && !solutionCharsTaken[index]
+				(x, index) => x === letter.toLowerCase() && !solutionCharsTaken[index]
 			)
 			if (indexOfPresentChar > -1) {
-			  statuses[i] = 'present'
-			  solutionCharsTaken[indexOfPresentChar] = true
-			  return
+				statuses[i] = 'present'
+				solutionCharsTaken[indexOfPresentChar] = true
+				return
 			} else {
-			  statuses[i] = 'absent'
-			  return
+				statuses[i] = 'absent'
+				return
 			}
-		  })
-		
-		  return { guessStatus: statuses, isWinningWord: guess.toLowerCase() == solution } 
+		})
+
+		return { guessStatus: statuses, isWinningWord: guess.toLowerCase() == solution }
 	}
 
 	static isLetterInWord(solution: string, letter: string, solutionCharsTaken: Array<boolean>) {
