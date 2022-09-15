@@ -61,7 +61,7 @@ const gameTypeStartsOn: gameTypeStartsOn = {
 	5: getCurrentIndianDateTime(),
 	6: new Date((getCurrentIndianDateTime().getTime() + 4 * 60 * 60 * 1000)),
 	// change it to new Date(0)
-	7: getCurrentIndianDateTime()
+	7: new Date((getCurrentIndianDateTime().getTime() + 8 * 60 * 60 * 1000))
 }
 
 const addTimeToDate = (date: Date, timeInMilliseconds: number): Date => new Date(date.getTime() + timeInMilliseconds)
